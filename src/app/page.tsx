@@ -1,104 +1,167 @@
+import Image from "next/image";
 import Link from "next/link";
-import { SectionCard } from "@/components/section-card";
-import { featuredRecipes, quickStats } from "@/lib/mock-data";
+import { featuredRecipes } from "@/lib/mock-data";
+
+const journeys = [
+  {
+    href: "/recipes",
+    index: "01",
+    title: "从一杯经典开始",
+    body: "按基酒、风味和调制方式，找到今晚真正想喝的那一杯。",
+    action: "探索配方",
+    tone: "amber"
+  },
+  {
+    href: "/cabinet",
+    index: "02",
+    title: "看看酒柜能做什么",
+    body: "标记手边已有的酒和辅料，优先发现现在就能完成的配方。",
+    action: "打开酒柜",
+    tone: "teal"
+  },
+  {
+    href: "/mix",
+    index: "03",
+    title: "把配方变成一杯酒",
+    body: "从杯型、冰块到装饰，跟着步骤完成调制并记录结果。",
+    action: "进入调制台",
+    tone: "coral"
+  }
+] as const;
 
 export default function HomePage() {
+  const [spotlightRecipe, ...moreRecipes] = featuredRecipes;
+
   return (
-    <main className="page-shell flex flex-col gap-10 py-10">
-      <section className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
-        <div className="panel flex flex-col gap-5 p-6">
-          <div className="flex flex-wrap gap-2">
-            <span className="pill">交互式调酒</span>
-            <span className="pill">个人酒柜</span>
-            <span className="pill">品鉴结果</span>
-          </div>
-          <div className="flex flex-col gap-3">
-            <h1 className="text-4xl font-semibold tracking-normal">Last Call</h1>
-            <p className="max-w-2xl text-[15px] leading-7 text-[var(--muted)]">
-              浏览经典鸡尾酒配方，把它们与你自己的酒柜联动，在网页里亲手调一杯，并保存属于你的品鉴卡片。
+    <main className="home-page">
+      <section className="home-hero">
+        <div className="home-hero__inner">
+          <div className="home-hero__copy">
+            <p className="home-kicker">今晚，从你的酒柜出发</p>
+            <h1>
+              找到今晚
+              <span>刚好的酒。</span>
+            </h1>
+            <p className="home-hero__lede">
+              浏览经典鸡尾酒，匹配手边原料，再一步步调出属于你的版本。Last Call 把发现、准备和记录放在同一个地方。
             </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Link className="cta" href="/recipes">
-              浏览配方
-            </Link>
-            <Link className="cta secondary" href="/cabinet">
-              打开酒柜
-            </Link>
-          </div>
-        </div>
-
-        <div className="panel grid gap-4 p-6 sm:grid-cols-2 lg:grid-cols-1">
-          {quickStats.map((stat) => (
-            <div key={stat.label} className="flex items-center justify-between border-b border-white/5 pb-4 last:border-b-0 last:pb-0">
-              <div>
-                <p className="text-sm text-[var(--muted)]">{stat.label}</p>
-                <p className="mt-1 text-xs text-[var(--muted)]">{stat.note}</p>
-              </div>
-              <strong className="text-2xl font-semibold">{stat.value}</strong>
+            <div className="home-actions">
+              <Link className="home-button home-button--primary" href="/recipes">
+                开始选酒
+                <span aria-hidden="true">→</span>
+              </Link>
+              <Link className="home-button home-button--secondary" href="/cabinet">
+                查看我的酒柜
+              </Link>
             </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <SectionCard
-          title="配方库"
-          body="按基酒、风味平衡，或你现在就能做的酒来查找。"
-          href="/recipes"
-          accent="var(--amber)"
-        />
-        <SectionCard
-          title="我的酒柜"
-          body="管理你真正拥有的酒和辅料，并找出最接近可完成的配方。"
-          href="/cabinet"
-          accent="var(--teal)"
-        />
-        <SectionCard
-          title="调制台"
-          body="从杯型、冰块、基酒到装饰，按步骤完成并获得即时反馈。"
-          href="/mix"
-          accent="var(--coral)"
-        />
-        <SectionCard
-          title="品鉴卡"
-          body="保存带有酒体、平衡和适饮场景建议的结构化结果。"
-          href="/taste/demo-negroni"
-          accent="var(--amber)"
-        />
-      </section>
-
-      <section className="flex flex-col gap-4">
-        <div className="flex items-end justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-semibold">推荐配方</h2>
-            <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
-              第一批种子数据会优先覆盖辨识度高的经典酒款，既方便浏览，也方便做酒柜联动。
-            </p>
           </div>
-          <Link className="text-sm text-[var(--amber)]" href="/recipes">
-            查看全部
-          </Link>
-        </div>
 
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {featuredRecipes.map((recipe) => (
-            <Link key={recipe.slug} href={`/recipes/${recipe.slug}`} className="panel flex flex-col gap-4 p-5 transition hover:border-white/20">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold">{recipe.name}</h3>
-                <span className="pill">{recipe.baseSpirit}</span>
+          <div className="home-hero__visual">
+            <Image
+              src="/images/home-cocktail.jpg"
+              alt="黑色背景前，一杯带橙皮装饰的琥珀色鸡尾酒"
+              fill
+              priority
+              sizes="(max-width: 767px) 100vw, 50vw"
+            />
+            <div className="home-hero__caption">
+              <span>Tonight&apos;s pour</span>
+              <strong>Old Fashioned</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="home-intro page-shell" aria-labelledby="home-intro-title">
+        <p className="home-section-note">一条更短的选酒路径</p>
+        <div className="home-intro__statement">
+          <h2 id="home-intro-title">不用先懂酒，也能从今晚的心情开始。</h2>
+          <p>
+            Last Call 不把你留在一堆标签里。先选想喝的风味，再看酒柜里有什么，最后跟着步骤完成一杯。
+          </p>
+        </div>
+      </section>
+
+      <section className="home-journeys page-shell" aria-label="开始探索">
+        {journeys.map((journey) => (
+          <Link
+            key={journey.href}
+            className={`home-journey home-journey--${journey.tone}`}
+            href={journey.href}
+          >
+            <span className="home-journey__index">{journey.index}</span>
+            <div>
+              <h2>{journey.title}</h2>
+              <p>{journey.body}</p>
+            </div>
+            <span className="home-journey__action">
+              {journey.action}
+              <span aria-hidden="true">↗</span>
+            </span>
+          </Link>
+        ))}
+      </section>
+
+      <section className="home-featured" aria-labelledby="featured-title">
+        <div className="page-shell">
+          <div className="home-featured__heading">
+            <div>
+              <p className="home-section-note">今晚推荐</p>
+              <h2 id="featured-title">先认识一杯经典。</h2>
+            </div>
+            <Link href="/recipes">查看全部配方 →</Link>
+          </div>
+
+          <div className="home-featured__layout">
+            <Link
+              className="home-spotlight"
+              href={`/recipes/${spotlightRecipe.slug}`}
+            >
+              <div className="home-spotlight__orb" aria-hidden="true">
+                <span />
               </div>
-              <p className="text-sm leading-6 text-[var(--muted)]">{recipe.summary}</p>
-              <div className="flex flex-wrap gap-2">
-                {recipe.tags.map((tag) => (
-                  <span key={tag} className="pill">
-                    {tag}
-                  </span>
-                ))}
+              <div className="home-spotlight__content">
+                <span className="home-spotlight__base">{spotlightRecipe.baseSpirit}</span>
+                <h3>{spotlightRecipe.name}</h3>
+                <p>{spotlightRecipe.summary}</p>
+                <span className="home-spotlight__link">查看配方 →</span>
               </div>
             </Link>
-          ))}
+
+            <div className="home-recipe-list">
+              {moreRecipes.map((recipe) => (
+                <Link
+                  key={recipe.slug}
+                  href={`/recipes/${recipe.slug}`}
+                  className="home-recipe-row"
+                >
+                  <div>
+                    <span>{recipe.baseSpirit}</span>
+                    <h3>{recipe.name}</h3>
+                  </div>
+                  <p>{recipe.summary}</p>
+                  <span className="home-recipe-row__arrow" aria-hidden="true">
+                    →
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
+      </section>
+
+      <section className="home-closing page-shell">
+        <div>
+          <p className="home-section-note">下一杯，由你决定</p>
+          <h2>今晚不必从零开始。</h2>
+        </div>
+        <p>
+          先把已有原料放进酒柜。我们会告诉你现在能做什么，以及只差哪一瓶。
+        </p>
+        <Link className="home-button home-button--light" href="/cabinet">
+          整理我的酒柜
+          <span aria-hidden="true">→</span>
+        </Link>
       </section>
     </main>
   );
