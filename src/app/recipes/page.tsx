@@ -6,12 +6,12 @@ export default function RecipesPage() {
     <main className="page-shell flex flex-col gap-6 py-10">
       <section className="flex flex-col gap-3">
         <h1 className="text-3xl font-semibold">配方库</h1>
-        <p className="max-w-3xl text-sm leading-6 text-[var(--muted)]">
+        <p className="text-muted max-w-3xl text-sm leading-6">
           这里先搭好内容结构和页面层级：筛选、风味标签、酒柜匹配，以及通向调制台的清晰路径。
         </p>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[280px_1fr]">
+      <section className="recipes-layout grid gap-4">
         <aside className="panel flex flex-col gap-4 p-5">
           <h2 className="text-lg font-semibold">筛选</h2>
           <div className="flex flex-wrap gap-2">
@@ -27,7 +27,7 @@ export default function RecipesPage() {
             <span className="pill">烈感</span>
           </div>
           <div className="panel p-4">
-            <p className="text-sm text-[var(--muted)]">
+            <p className="text-muted text-sm">
               酒柜匹配逻辑还没正式接线，但界面位置和数据模型已经在这版骨架里预留好了。
             </p>
           </div>
@@ -44,7 +44,7 @@ export default function RecipesPage() {
                 <h2 className="text-lg font-semibold">{recipe.name}</h2>
                 <span className="pill">{recipe.baseSpirit}</span>
               </div>
-              <p className="text-sm leading-6 text-[var(--muted)]">{recipe.summary}</p>
+              <p className="text-muted text-sm leading-6">{recipe.summary}</p>
               <div className="flex flex-wrap gap-2">
                 {recipe.tags.map((tag) => (
                   <span key={tag} className="pill">
@@ -52,7 +52,7 @@ export default function RecipesPage() {
                   </span>
                 ))}
               </div>
-              <div className="mt-auto flex items-center justify-between text-sm text-[var(--muted)]">
+              <div className="text-muted mt-auto flex items-center justify-between text-sm">
                 <span>{recipe.glassware}</span>
                 <span>{recipe.difficulty}</span>
               </div>

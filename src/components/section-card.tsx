@@ -16,9 +16,9 @@ export function SectionCard({ title, body, href, accent }: SectionCardProps) {
       />
       <div className="space-y-2">
         <h2 className="text-lg font-semibold">{title}</h2>
-        <p className="text-sm leading-6 text-[var(--muted)]">{body}</p>
+        <p className="text-sm leading-6 text-(--muted)">{body}</p>
       </div>
-      <span className="text-sm font-medium text-[var(--amber)]">进入</span>
+      <span className="text-sm font-medium text-(--amber)">进入</span>
     </Link>
   );
 }

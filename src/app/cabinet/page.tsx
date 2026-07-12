@@ -5,7 +5,7 @@ export default function CabinetPage() {
     <main className="page-shell flex flex-col gap-8 py-10">
       <section className="flex flex-col gap-3">
         <h1 className="text-3xl font-semibold">我的酒柜</h1>
-        <p className="max-w-3xl text-sm leading-6 text-[var(--muted)]">
+        <p className="max-w-3xl text-sm leading-6 text-(--muted)">
           MVP 先从简单的拥有状态开始：已拥有、常备、缺货。这样已经足够驱动配方匹配，不必一开始就陷入瓶级库存的复杂度。
         </p>
       </section>
@@ -16,9 +16,9 @@ export default function CabinetPage() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
             {cabinetOverview.map((item) => (
               <div key={item.label} className="panel p-4">
-                <p className="text-xs uppercase tracking-wide text-[var(--muted)]">{item.label}</p>
+                <p className="text-xs uppercase tracking-wide text-(--muted)">{item.label}</p>
                 <p className="mt-2 text-2xl font-semibold">{item.value}</p>
-                <p className="mt-1 text-sm text-[var(--muted)]">{item.note}</p>
+                <p className="mt-1 text-sm text-(--muted)">{item.note}</p>
               </div>
             ))}
           </div>
@@ -35,7 +35,7 @@ export default function CabinetPage() {
           </div>
           <div className="panel p-4">
             <p className="text-sm font-medium">下一步最值得补的酒</p>
-            <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-[var(--muted)]">
+            <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-(--muted)">
               <li>甜味美思</li>
               <li>金巴利</li>
               <li>白龙舌兰</li>
@@ -45,7 +45,7 @@ export default function CabinetPage() {
             {featuredRecipes.slice(0, 2).map((recipe) => (
               <div key={recipe.slug} className="panel p-4">
                 <p className="text-sm font-semibold">{recipe.name}</p>
-                <p className="mt-2 text-sm text-[var(--muted)]">{recipe.summary}</p>
+                <p className="mt-2 text-sm text-(--muted)">{recipe.summary}</p>
               </div>
             ))}
           </div>
