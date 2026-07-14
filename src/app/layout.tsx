@@ -1,7 +1,29 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { Modak, Mouse_Memoirs, ZCOOL_KuaiLe } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
 import "./globals.css";
+
+const modak = Modak({
+  variable: "--font-modak",
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap"
+});
+
+const mouseMemoirs = Mouse_Memoirs({
+  variable: "--font-mouse-memoirs",
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap"
+});
+
+const zcoolKuaiLe = ZCOOL_KuaiLe({
+  variable: "--font-zcool-kuaile",
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap"
+});
 
 export const metadata: Metadata = {
   title: "Last Call",
@@ -15,7 +37,7 @@ type RootLayoutProps = Readonly<{
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="zh-CN">
-      <body>
+      <body className={`${modak.variable} ${mouseMemoirs.variable} ${zcoolKuaiLe.variable}`}>
         <SiteHeader />
         {children}
       </body>
