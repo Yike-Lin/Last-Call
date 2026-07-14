@@ -1,35 +1,85 @@
+"use client";
+
+import { useEffect, useId, useState } from "react";
 import Link from "next/link";
 import { navigation } from "@/lib/site";
 
 export function SiteHeader() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuId = useId();
+
+  useEffect(() => {
+    if (!isMenuOpen) {
+      return;
+    }
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMenuOpen(false);
+      }
+    };
+
+    document.addEventListener("keydown", closeOnEscape);
+    return () => document.removeEventListener("keydown", closeOnEscape);
+  }, [isMenuOpen]);
+
   return (
-    <header className="site-header-shell sticky top-0 z-50 border-b border-white/8 backdrop-blur">
-      <div className="page-shell flex min-h-16 items-center justify-between gap-6">
-        <Link href="/" className="flex items-center gap-3">
-          <span className="bg-surface inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/10 text-sm font-semibold">
-            LC
-          </span>
-          <div>
-            <strong className="block text-sm font-semibold">Last Call</strong>
-            <span className="text-muted block text-xs">交互式鸡尾酒网站</span>
-          </div>
+    <header className="site-header-shell">
+      <div className="site-header-inner">
+        <Link href="/" className="site-header-brand" aria-label="返回首页">
+          Last Call
         </Link>
 
-        <nav className="hidden items-center gap-5 md:flex">
-          {navigation.map((item) => (
-            <Link key={item.href} href={item.href} className="site-nav-link text-sm">
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="flex items-center gap-3">
-          <Link href="/recipes" className="cta secondary hidden sm:inline-flex">
-            搜索
-          </Link>
-          <Link href="/cabinet" className="cta">
+        <div className="site-header-actions">
+          <Link href="/cabinet" className="site-header-cabinet">
             酒柜
           </Link>
+
+          <div className={`site-header-menu-control${isMenuOpen ? " site-header-menu-control--open" : ""}`}>
+            <nav
+              id={menuId}
+              role="menu"
+              className={`site-header-menu${isMenuOpen ? " site-header-menu--open" : ""}`}
+              aria-label="网站菜单"
+              aria-hidden={!isMenuOpen}
+            >
+              {navigation.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="site-header-menu__link"
+                  role="menuitem"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+
+            <button
+              type="button"
+              className="site-header-menu-toggle"
+              aria-controls={menuId}
+              aria-expanded={isMenuOpen}
+              aria-haspopup="menu"
+              aria-label={isMenuOpen ? "关闭菜单" : "打开菜单"}
+              onClick={() => setIsMenuOpen((isOpen) => !isOpen)}
+            >
+              {isMenuOpen ? (
+                <span className="site-header-menu-close" aria-hidden="true">
+                  ×
+                </span>
+              ) : (
+                <>
+                  <span className="site-header-menu-label">菜单</span>
+                  <span className="site-header-menu-icon" aria-hidden="true">
+                    <i />
+                    <i />
+                  </span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </header>
