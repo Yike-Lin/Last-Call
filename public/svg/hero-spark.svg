@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Cocktail toast spark</title>
+  <desc id="desc">A four point cognac spark for the title collision moment.</desc>
+  <g id="toast-spark" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M120 18L138 96L222 120L138 142L120 222L99 142L18 120L99 96L120 18Z" fill="#D98A32" stroke="#F2E7D5" stroke-width="10"/>
+    <path d="M120 66L130 110L176 120L130 130L120 176L108 130L64 120L108 110L120 66Z" fill="#F2E7D5"/>
+  </g>
+</svg>

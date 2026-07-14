@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 900" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Amber pour stream</title>
+  <desc id="desc">A flexible stream of amber cocktail liquid for the pouring animation.</desc>
+  <g id="pour-stream" stroke-linecap="round">
+    <path d="M90 12C84 156 103 250 92 364C82 477 68 611 91 884" stroke="#8A421D" stroke-width="42"/>
+    <path d="M90 12C84 156 103 250 92 364C82 477 68 611 91 884" stroke="#D98A32" stroke-width="30"/>
+    <path d="M82 24C77 174 93 257 84 356C75 466 67 570 81 726" stroke="#F2B65B" stroke-width="8" stroke-opacity=".88"/>
+    <path d="M91 870C70 847 62 831 66 808" stroke="#D98A32" stroke-width="22"/>
+    <path d="M90 874C108 847 119 829 116 807" stroke="#D98A32" stroke-width="17"/>
+  </g>
+</svg>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1100" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Old Fashioned glass shadow</title>
+  <desc id="desc">A soft tabletop shadow aligned below the Old Fashioned glass.</desc>
+  <defs>
+    <radialGradient id="shadow-gradient" cx="0" cy="0" r="1" gradientTransform="translate(400 848) rotate(90) scale(76 268)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0B0A08" stop-opacity=".62"/>
+      <stop offset=".58" stop-color="#0B0A08" stop-opacity=".28"/>
+      <stop offset="1" stop-color="#0B0A08" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g id="glass-shadow">
+    <ellipse cx="400" cy="848" rx="268" ry="76" fill="url(#shadow-gradient)"/>
+    <ellipse cx="400" cy="838" rx="172" ry="27" fill="#D98A32" fill-opacity=".14"/>
+  </g>
+</svg>

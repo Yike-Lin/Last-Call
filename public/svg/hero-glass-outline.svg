@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1100" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Cartoon Old Fashioned glass outline</title>
+  <desc id="desc">A rounded, thick-bottomed cut-glass tumbler with warm cognac reflections.</desc>
+
+  <g id="glass-body">
+    <path
+      d="M132 320C132 285 253 260 400 260C547 260 668 285 668 320L630 741C627 788 580 820 400 820C220 820 173 788 170 741L132 320Z"
+      fill="#F2E7D5"
+      fill-opacity=".07"
+      stroke="#F2E7D5"
+      stroke-width="15"
+      stroke-linejoin="round"
+    />
+    <path
+      d="M169 326C182 353 274 372 400 372C526 372 618 353 631 326"
+      stroke="#F2E7D5"
+      stroke-width="12"
+      stroke-linecap="round"
+    />
+  </g>
+
+  <g id="glass-rim">
+    <ellipse cx="400" cy="320" rx="268" ry="62" fill="#0B0A08" fill-opacity=".18" stroke="#F2E7D5" stroke-width="15"/>
+    <ellipse cx="400" cy="320" rx="224" ry="37" stroke="#F2E7D5" stroke-opacity=".78" stroke-width="10"/>
+    <path d="M228 305C274 284 334 276 400 276C466 276 526 284 572 305" stroke="#D98A32" stroke-width="13" stroke-linecap="round"/>
+  </g>
+
+  <g id="glass-facets" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M174 482L274 571L224 735L170 692" stroke="#F2E7D5" stroke-opacity=".42" stroke-width="10"/>
+    <path d="M274 571L400 474L400 677L224 735" stroke="#F2E7D5" stroke-opacity=".48" stroke-width="10"/>
+    <path d="M400 474L526 571L576 735L400 677" stroke="#F2E7D5" stroke-opacity=".48" stroke-width="10"/>
+    <path d="M526 571L626 482L630 692L576 735" stroke="#F2E7D5" stroke-opacity=".42" stroke-width="10"/>
+    <path d="M224 735L400 677L576 735L520 807L400 820L280 807L224 735Z" stroke="#D98A32" stroke-width="12"/>
+    <path d="M274 571L338 645L400 677L462 645L526 571" stroke="#D98A32" stroke-opacity=".9" stroke-width="9"/>
+  </g>
+
+  <g id="glass-highlights" stroke-linecap="round">
+    <path d="M191 392C178 488 186 585 208 651" stroke="#F2E7D5" stroke-width="19" stroke-opacity=".85"/>
+    <path d="M235 407C224 461 226 510 237 548" stroke="#F2E7D5" stroke-width="9" stroke-opacity=".64"/>
+    <path d="M582 390C597 459 594 511 580 554" stroke="#D98A32" stroke-width="14" stroke-opacity=".9"/>
+    <path d="M304 780C354 797 446 797 496 780" stroke="#F2E7D5" stroke-width="9" stroke-opacity=".62"/>
+  </g>
+
+  <g id="glass-reflections">
+    <path d="M188 694C245 748 327 772 400 772C473 772 555 748 612 694L602 744C596 785 545 805 400 805C255 805 204 785 198 744L188 694Z" fill="#D98A32" fill-opacity=".16"/>
+    <path d="M300 806C344 821 456 821 500 806" stroke="#D98A32" stroke-width="15" stroke-linecap="round"/>
+  </g>
+</svg>
