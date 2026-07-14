@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1100" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Orange peel garnish</title>
+  <desc id="desc">A curled orange peel garnish aligned to the Old Fashioned glass rim.</desc>
+  <g id="orange-peel" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M285 380C247 339 266 274 336 252C415 227 540 258 546 322C551 370 502 394 454 372C416 355 416 315 451 296C482 279 526 291 555 316" fill="#D98A32" stroke="#F2E7D5" stroke-width="12"/>
+    <path d="M300 370C277 333 299 289 347 274C403 256 483 276 493 318" stroke="#F2B65B" stroke-width="15"/>
+    <path d="M322 351C345 322 389 303 430 311" stroke="#F2E7D5" stroke-opacity=".56" stroke-width="9"/>
+    <path d="M534 315C563 337 574 363 568 391" stroke="#D98A32" stroke-width="24"/>
+  </g>
+</svg>

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1100" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Amber cocktail liquid</title>
+  <desc id="desc">A full layer of amber liquid aligned to the Old Fashioned glass.</desc>
+  <defs>
+    <linearGradient id="liquid-gradient" x1="400" y1="372" x2="400" y2="806" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F2B65B"/>
+      <stop offset=".46" stop-color="#D98A32"/>
+      <stop offset="1" stop-color="#8A421D"/>
+    </linearGradient>
+  </defs>
+  <g id="liquid-fill">
+    <path d="M174 390C218 409 302 421 400 421C498 421 582 409 626 390L603 727C599 769 553 789 400 789C247 789 201 769 197 727L174 390Z" fill="url(#liquid-gradient)"/>
+    <path d="M174 390C218 409 302 421 400 421C498 421 582 409 626 390" stroke="#F2E7D5" stroke-opacity=".72" stroke-width="9" stroke-linecap="round"/>
+    <path d="M210 713C276 748 522 748 590 713L584 753C545 777 255 777 216 753L210 713Z" fill="#6E2D18" fill-opacity=".34"/>
+    <path d="M234 454C273 472 307 479 338 480" stroke="#F2E7D5" stroke-opacity=".2" stroke-width="13" stroke-linecap="round"/>
+  </g>
+</svg>

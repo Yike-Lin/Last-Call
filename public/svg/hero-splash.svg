@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1100" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Cocktail liquid splash</title>
+  <desc id="desc">A subtle amber surface splash aligned to the filled Old Fashioned glass.</desc>
+  <g id="liquid-splash" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M190 431C236 408 286 445 332 427C374 410 415 392 462 415C510 439 551 404 610 430" stroke="#F2B65B" stroke-width="17"/>
+    <path d="M206 438C264 464 315 449 361 432C405 416 449 419 489 439C534 461 572 448 598 438" stroke="#D98A32" stroke-width="12"/>
+    <path d="M291 412C282 386 289 365 307 347" stroke="#D98A32" stroke-width="13"/>
+    <path d="M487 406C500 382 500 357 487 334" stroke="#D98A32" stroke-width="11"/>
+    <circle cx="308" cy="328" r="10" fill="#D98A32"/>
+    <circle cx="487" cy="316" r="8" fill="#F2B65B"/>
+  </g>
+</svg>

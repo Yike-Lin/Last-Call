@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1100" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Cartoon cocktail ice</title>
+  <desc id="desc">Two rounded ice cubes aligned inside the Old Fashioned glass.</desc>
+  <g id="ice-cubes" stroke-linejoin="round">
+    <path d="M238 487L349 452L429 533L377 649L262 667L204 573L238 487Z" fill="#F2E7D5" fill-opacity=".28" stroke="#F2E7D5" stroke-opacity=".76" stroke-width="11"/>
+    <path d="M238 487L320 566L429 533M320 566L377 649" stroke="#F2E7D5" stroke-opacity=".52" stroke-width="9"/>
+    <path d="M411 470L528 451L602 548L557 659L434 672L369 575L411 470Z" fill="#F2E7D5" fill-opacity=".24" stroke="#F2E7D5" stroke-opacity=".72" stroke-width="11"/>
+    <path d="M411 470L479 564L602 548M479 564L557 659" stroke="#F2E7D5" stroke-opacity=".48" stroke-width="9"/>
+  </g>
+</svg>

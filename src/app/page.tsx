@@ -33,13 +33,9 @@ export default function HomePage() {
       <section className="home-hero">
         <div className="home-hero__inner">
           <div className="home-hero__copy">
-            <p className="home-kicker">Last Call</p>
-            <h1>
-              找到今晚
-              <span>刚好的酒。</span>
-            </h1>
+            <h1>Last Call</h1>
             <p className="home-hero__lede">
-              像站在吧台前点单一样，从风味开始，顺着你的酒柜一路走到第一口。发现、准备和记录，都留在同一条调酒动线里。
+              这一杯，算你会喝
             </p>
             <div className="home-actions">
               <Link className="home-button home-button--primary" href="/recipes">
