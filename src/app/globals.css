@@ -457,32 +457,20 @@ body:has(.home-page) .bg-surface {
   text-align: center;
 }
 
-.home-kicker {
-  margin: 0;
-  font-size: 0.78rem;
-  font-weight: 800;
-  line-height: 1.4;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
-  margin-bottom: 24px;
-  color: var(--home-accent);
-}
-
 .home-hero h1 {
-  max-width: 8em;
+  max-width: 100%;
   margin: 0;
   padding-bottom: 12px;
-  font-size: clamp(3.85rem, 8vw, 6.25rem);
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.02;
-  text-wrap: balance;
-  text-shadow: 0 12px 44px rgba(217, 138, 50, 0.13);
-}
-
-.home-hero h1 span {
-  display: block;
-  color: var(--home-text);
+  color: var(--home-accent);
+  font-family: var(--font-modak), "Arial Rounded MT Bold", sans-serif;
+  font-size: clamp(3.15rem, 8vw, 6.25rem);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 0.94;
+  text-transform: uppercase;
+  white-space: nowrap;
+  -webkit-text-stroke: 2px rgba(242, 231, 213, 0.88);
+  text-shadow: 0 12px 44px rgba(217, 138, 50, 0.16);
 }
 
 .home-hero__lede {
@@ -492,6 +480,7 @@ body:has(.home-page) .bg-surface {
   line-height: 1.75;
   color: rgba(242, 231, 213, 0.82);
   text-wrap: pretty;
+  white-space: nowrap;
 }
 
 .home-actions {
