@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0d1117;
-  --surface: #141b23;
-  --surface-2: #1a2330;
-  --surface-3: #243041;
-  --foreground: #f5f7fa;
-  --muted: #93a0b2;
-  --border: rgba(255, 255, 255, 0.08);
-  --amber: #d5a34a;
-  --teal: #2db6a3;
-  --coral: #d66b5a;
+  --background: #0b0a08;
+  --surface: #15110c;
+  --surface-2: #21170f;
+  --surface-3: #2a1d12;
+  --foreground: #f2e7d5;
+  --muted: #b8a995;
+  --border: rgba(217, 138, 50, 0.22);
+  --amber: #d98a32;
+  --teal: #d98a32;
+  --coral: #d98a32;
 }
 
 * {
@@ -25,8 +25,8 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    radial-gradient(circle at top right, rgba(45, 182, 163, 0.12), transparent 28%),
-    radial-gradient(circle at top left, rgba(213, 163, 74, 0.12), transparent 24%),
+    radial-gradient(circle at top right, rgba(217, 138, 50, 0.08), transparent 28%),
+    radial-gradient(circle at top left, rgba(242, 231, 213, 0.04), transparent 24%),
     var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
@@ -50,7 +50,7 @@ select {
 
 .panel {
   border: 1px solid var(--border);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+  background: linear-gradient(180deg, rgba(242, 231, 213, 0.04), rgba(11, 10, 8, 0.72));
   border-radius: 8px;
 }
 
@@ -73,7 +73,7 @@ select {
   border-radius: 8px;
   border: 1px solid transparent;
   background: var(--amber);
-  color: #11161d;
+  color: var(--background);
   font-weight: 700;
 }
 
@@ -93,6 +93,10 @@ select {
 
 .bg-surface {
   background: var(--surface);
+}
+
+body:not(:has(.home-page)) main.page-shell {
+  padding-top: 132px;
 }
 
 .site-header-shell {
@@ -337,7 +341,7 @@ select {
   bottom: 8px;
   height: 20px;
   border-radius: 999px;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(11, 10, 8, 0.3);
   filter: blur(12px);
 }
 
@@ -349,9 +353,9 @@ select {
   align-items: flex-end;
   justify-content: center;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(242, 231, 213, 0.18);
   border-radius: 18px 18px 24px 24px;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(242, 231, 213, 0.05);
 }
 
 .mix-liquid {
@@ -359,7 +363,7 @@ select {
   inset-inline: 0;
   bottom: 0;
   height: 52%;
-  background: linear-gradient(180deg, rgba(214, 107, 90, 0.95), rgba(127, 49, 40, 0.92));
+  background: linear-gradient(180deg, rgba(217, 138, 50, 0.95), rgba(125, 67, 25, 0.92));
 }
 
 .mix-ice-left {
@@ -370,7 +374,7 @@ select {
   width: 40px;
   transform: rotate(6deg);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(242, 231, 213, 0.15);
 }
 
 .mix-ice-right {
@@ -381,7 +385,7 @@ select {
   width: 44px;
   transform: rotate(-6deg);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(242, 231, 213, 0.15);
 }
 
 .mix-orange-peel {
@@ -391,7 +395,7 @@ select {
   height: 64px;
   width: 12px;
   border-radius: 999px;
-  background: linear-gradient(180deg, #ffbf6d, #d87c2d);
+  background: linear-gradient(180deg, #f2e7d5, #d98a32);
 }
 
 @media (min-width: 1024px) {
@@ -852,6 +856,10 @@ body:has(.home-page) .bg-surface {
 }
 
 @media (max-width: 767px) {
+  body:not(:has(.home-page)) main.page-shell {
+    padding-top: 104px;
+  }
+
   .site-header-inner {
     min-height: 72px;
     padding: 4vw;
