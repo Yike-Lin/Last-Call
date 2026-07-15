@@ -57,7 +57,7 @@ export default async function TasteResultPage({ params }: TasteResultPageProps) 
                   <span>{item.label}</span>
                   <span className="text-(--muted)">{item.value}/5</span>
                 </div>
-                <div className="h-2 rounded-full bg-white/6">
+                <div className="h-2 rounded-full bg-(--surface-2)">
                   <div
                     className="h-2 rounded-full bg-(--amber)"
                     style={{ width: `${item.value * 20}%` }}
