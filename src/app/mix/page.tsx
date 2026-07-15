@@ -22,7 +22,7 @@ export default function MixPage() {
           {["鸡尾酒杯", "古典杯", "海波杯"].map((glass) => (
             <button
               key={glass}
-              className="panel flex min-h-11 items-center justify-between px-4 text-left transition hover:border-white/20"
+              className="panel flex min-h-11 items-center justify-between px-4 text-left transition hover:border-(--amber)"
               type="button"
             >
               <span>{glass}</span>
@@ -69,7 +69,7 @@ export default function MixPage() {
         <ol className="text-muted space-y-3 text-sm">
           {buildSteps.map((step, index) => (
             <li key={step} className="flex gap-3">
-              <span className="text-foreground mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/10 text-xs font-semibold">
+              <span className="text-foreground mt-0.5 inline-flex h-6 w-6 items-center justify-center rounded-full border border-(--border) text-xs font-semibold">
                 {index + 1}
               </span>
               <span>{step}</span>

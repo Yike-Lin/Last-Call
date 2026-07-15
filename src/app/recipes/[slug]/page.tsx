@@ -79,7 +79,7 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
           <h2 className="text-xl font-semibold">原料</h2>
           <ul className="space-y-3 text-sm text-(--muted)">
             {recipe.ingredients.map((ingredient) => (
-              <li key={ingredient.name} className="flex items-center justify-between gap-4 border-b border-white/5 pb-3 last:border-b-0 last:pb-0">
+              <li key={ingredient.name} className="flex items-center justify-between gap-4 border-b border-(--border) pb-3 last:border-b-0 last:pb-0">
                 <span>{ingredient.name}</span>
                 <strong className="font-medium text-(--foreground)">{ingredient.amount}</strong>
               </li>
@@ -92,7 +92,7 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
           <ol className="space-y-3 text-sm leading-6 text-(--muted)">
             {recipe.steps.map((step) => (
               <li key={step} className="flex gap-3">
-                <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full border border-white/10 text-xs font-semibold text-(--foreground)">
+                <span className="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full border border-(--border) text-xs font-semibold text-(--foreground)">
                   {recipe.steps.indexOf(step) + 1}
                 </span>
                 <span>{step}</span>

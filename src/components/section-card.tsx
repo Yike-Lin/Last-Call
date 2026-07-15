@@ -9,7 +9,7 @@ type SectionCardProps = {
 
 export function SectionCard({ title, body, href, accent }: SectionCardProps) {
   return (
-    <Link href={href} className="panel flex min-h-44 flex-col justify-between gap-5 p-5 transition hover:border-white/20">
+    <Link href={href} className="panel flex min-h-44 flex-col justify-between gap-5 p-5 transition hover:border-(--amber)">
       <div
         className="h-1 w-14 rounded-full"
         style={{ backgroundColor: accent }}
