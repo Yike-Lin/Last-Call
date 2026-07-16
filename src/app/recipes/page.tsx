@@ -1,6 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
-import { recipes } from "@/lib/mock-data";
+import { getPublishedRecipes } from "@/lib/recipes";
 
 const flavorShortcuts = [
   "清爽一点",
@@ -13,19 +12,26 @@ const flavorShortcuts = [
 
 const baseSpirits = ["全部", "金酒", "朗姆", "龙舌兰", "威士忌"] as const;
 
-export default function RecipesPage() {
+export default async function RecipesPage() {
+  const recipes = await getPublishedRecipes();
   const spotlightRecipe = recipes[0];
+
+  if (!spotlightRecipe) {
+    return (
+      <main className="recipes-page page-shell">
+        <section className="recipes-page__intro">
+          <div className="recipes-page__heading">
+            <h1>配方正在上架</h1>
+            <p>酒单还在整理，稍后再来看看今晚适合哪一杯。</p>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className="recipes-page page-shell">
-      <section className="recipes-page__intro" aria-labelledby="recipes-title">
-        <div className="recipes-page__heading">
-          <h1 id="recipes-title">今晚，先选一杯。</h1>
-          <p>
-            知道名字就搜名字。不知道也没关系，告诉我想喝得酸一点、苦一点，还是轻一点。
-          </p>
-        </div>
-
+      <section className="recipes-page__intro">
         <div className="recipes-search">
           <input
             aria-label="搜索配方"
@@ -120,68 +126,8 @@ export default function RecipesPage() {
           </div>
         </div>
 
-        <aside className="recipes-stage" aria-labelledby="spotlight-recipe-title">
-          <div className="recipes-stage__heading">
-            <p>今晚先喝它</p>
-            <h2 id="spotlight-recipe-title">{spotlightRecipe.name}</h2>
-            <span>{spotlightRecipe.summary}</span>
-          </div>
-
-          <div className="recipes-stage__visual">
-            <Image
-              src="/images/home-cocktail.jpg"
-              alt={`${spotlightRecipe.name} 成品鸡尾酒`}
-              fill
-              priority
-              sizes="(min-width: 1024px) 54vw, 100vw"
-            />
-          </div>
-
-          <div className="recipes-stage__details">
-            <dl className="recipes-stage__facts">
-              <div>
-                <dt>杯型</dt>
-                <dd>{spotlightRecipe.glassware}</dd>
-              </div>
-              <div>
-                <dt>做法</dt>
-                <dd>{spotlightRecipe.method}</dd>
-              </div>
-              <div>
-                <dt>酒精度</dt>
-                <dd>{spotlightRecipe.estimatedAbv}</dd>
-              </div>
-            </dl>
-
-            <div className="recipes-stage__ingredients">
-              {spotlightRecipe.ingredients.slice(0, 3).map((ingredient) => (
-                <span key={ingredient.name}>
-                  {ingredient.name} {ingredient.amount}
-                </span>
-              ))}
-            </div>
-
-            <div className="recipes-stage__actions">
-              <Link className="cta" href={`/recipes/${spotlightRecipe.slug}`}>
-                查看完整配方
-              </Link>
-              <Link className="cta secondary" href="/mix">
-                按我的口味改
-              </Link>
-            </div>
-          </div>
-        </aside>
       </section>
 
-      <section className="recipes-mix-bridge">
-        <div>
-          <h2>没找到完全合适的？</h2>
-          <p>从一杯经典开始，再把甜度、酒感和收尾慢慢调成你的版本。</p>
-        </div>
-        <Link className="cta" href="/mix">
-          去赛博调酒
-        </Link>
-      </section>
     </main>
   );
 }

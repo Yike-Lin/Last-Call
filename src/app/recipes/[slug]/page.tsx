@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getRecipeBySlug, recipes } from "@/lib/mock-data";
+import {
+  getPublishedRecipeBySlug,
+  getPublishedRecipeSlugs
+} from "@/lib/recipes";
 
 type RecipeDetailPageProps = {
   params: Promise<{
@@ -8,13 +11,14 @@ type RecipeDetailPageProps = {
   }>;
 };
 
-export function generateStaticParams() {
-  return recipes.map((recipe) => ({ slug: recipe.slug }));
+export async function generateStaticParams() {
+  const slugs = await getPublishedRecipeSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export default async function RecipeDetailPage({ params }: RecipeDetailPageProps) {
   const { slug } = await params;
-  const recipe = getRecipeBySlug(slug);
+  const recipe = await getPublishedRecipeBySlug(slug);
 
   if (!recipe) {
     notFound();

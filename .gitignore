@@ -4,6 +4,8 @@ node_modules
 .env.local
 .env.*.local
 .npm-cache
+supabase/.branches
+supabase/.temp
 coverage
 dist
 *.log
