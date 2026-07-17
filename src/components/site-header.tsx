@@ -1,86 +1,58 @@
 "use client";
 
-import { useEffect, useId, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { navigation } from "@/lib/site";
 
 export function SiteHeader() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const menuId = useId();
+  const [isHidden, setIsHidden] = useState(false);
 
   useEffect(() => {
-    if (!isMenuOpen) {
+    if (CSS.supports("animation-timeline: scroll()")) {
       return;
     }
 
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsMenuOpen(false);
+    const updateVisibility = () => {
+      const heroTitle = document.querySelector<HTMLElement>(".home-hero h1");
+
+      if (!heroTitle) {
+        setIsHidden(false);
+        return;
       }
+
+      const titleBounds = heroTitle.getBoundingClientRect();
+      const titleMiddle = titleBounds.top + window.scrollY + titleBounds.height / 2;
+      setIsHidden(window.scrollY >= titleMiddle - 84);
     };
 
-    document.addEventListener("keydown", closeOnEscape);
-    return () => document.removeEventListener("keydown", closeOnEscape);
-  }, [isMenuOpen]);
+    updateVisibility();
+    window.addEventListener("scroll", updateVisibility, { passive: true });
+    window.addEventListener("resize", updateVisibility);
+
+    return () => {
+      window.removeEventListener("scroll", updateVisibility);
+      window.removeEventListener("resize", updateVisibility);
+    };
+  }, []);
 
   return (
-    <header className="site-header-shell">
+    <header className={`site-header-shell${isHidden ? " site-header-shell--hidden" : ""}`}>
       <div className="site-header-inner">
         <Link href="/" className="site-header-brand" aria-label="返回首页">
           Last Call
         </Link>
 
-        <div className="site-header-actions">
-          <Link href="/cabinet" className="site-header-cabinet">
-            酒柜
-          </Link>
+        <nav className="site-header-nav" aria-label="主导航">
+          {navigation.map((item) => (
+            <Link key={item.href} href={item.href} className="site-header-nav__link">
+              {item.label}
+            </Link>
+          ))}
+        </nav>
 
-          <div className={`site-header-menu-control${isMenuOpen ? " site-header-menu-control--open" : ""}`}>
-            <nav
-              id={menuId}
-              role="menu"
-              className={`site-header-menu${isMenuOpen ? " site-header-menu--open" : ""}`}
-              aria-label="网站菜单"
-              aria-hidden={!isMenuOpen}
-            >
-              {navigation.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="site-header-menu__link"
-                  role="menuitem"
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
-
-            <button
-              type="button"
-              className="site-header-menu-toggle"
-              aria-controls={menuId}
-              aria-expanded={isMenuOpen}
-              aria-haspopup="menu"
-              aria-label={isMenuOpen ? "关闭菜单" : "打开菜单"}
-              onClick={() => setIsMenuOpen((isOpen) => !isOpen)}
-            >
-              {isMenuOpen ? (
-                <span className="site-header-menu-close" aria-hidden="true">
-                  ×
-                </span>
-              ) : (
-                <>
-                  <span className="site-header-menu-label">菜单</span>
-                  <span className="site-header-menu-icon" aria-hidden="true">
-                    <i />
-                    <i />
-                  </span>
-                </>
-              )}
-            </button>
-          </div>
-        </div>
+        <Link href="mailto:hello@lastcall.com" className="site-header-contact">
+          联系我们
+        </Link>
       </div>
     </header>
   );
