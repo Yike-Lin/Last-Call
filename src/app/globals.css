@@ -1202,6 +1202,7 @@ body:has(.recipe-catalog-page) .site-header-shell {
 }
 
 .recipe-catalog-card h2 {
+  flex: 1 1 auto;
   min-width: 0;
   margin: 0;
   color: var(--recipe-ink);
@@ -1209,6 +1210,33 @@ body:has(.recipe-catalog-page) .site-header-shell {
   font-weight: 700;
   line-height: 1.2;
   text-wrap: balance;
+}
+
+.recipe-catalog-card__spirit-tag {
+  display: inline-flex;
+  min-height: 22px;
+  max-width: 45%;
+  flex: 0 0 auto;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid rgba(24, 21, 22, 0.12);
+  border-left: 3px solid var(--recipe-accent);
+  border-radius: 8px;
+  padding: 4px 7px 3px 6px;
+  background: color-mix(in srgb, var(--recipe-accent) 9%, rgba(255, 252, 247, 0.44));
+  color: rgba(24, 21, 22, 0.62);
+  font-family: Arial, Helvetica, "Microsoft YaHei", sans-serif;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition:
+    border-color 240ms ease,
+    background 240ms ease,
+    color 240ms ease,
+    transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .recipe-catalog-card__tags {
@@ -1274,6 +1302,15 @@ body:has(.recipe-catalog-page) .site-header-shell {
     color-mix(in srgb, var(--tag-paper, var(--recipe-paper)) 92%, var(--recipe-paper));
   color: var(--tag-ink, var(--recipe-ink));
   transform: translateY(-1px) rotate(var(--tag-tilt, 0deg));
+}
+
+.recipe-catalog-card__link:hover .recipe-catalog-card__spirit-tag,
+.recipe-catalog-card__link:focus-visible .recipe-catalog-card__spirit-tag {
+  border-color: color-mix(in srgb, var(--recipe-accent) 30%, rgba(24, 21, 22, 0.16));
+  border-left-color: var(--recipe-accent);
+  background: color-mix(in srgb, var(--recipe-accent) 13%, rgba(255, 252, 247, 0.5));
+  color: rgba(24, 21, 22, 0.78);
+  transform: translateY(-1px);
 }
 
 .recipe-catalog-card__link:focus-visible {
@@ -1468,6 +1505,14 @@ body:has(.recipe-catalog-page) .site-header-shell {
     font-size: 0.98rem;
   }
 
+  .recipe-catalog-card__spirit-tag {
+    min-height: 20px;
+    max-width: 48%;
+    border-radius: 7px;
+    padding: 4px 6px 3px 5px;
+    font-size: 0.56rem;
+  }
+
   .recipe-catalog-card__tags {
     gap: 5px;
     min-height: 27px;
@@ -1493,6 +1538,7 @@ body:has(.recipe-catalog-page) .site-header-shell {
 
   .recipe-catalog-filter-options button::after,
   .recipe-catalog-card__stage,
+  .recipe-catalog-card__spirit-tag,
   .recipe-catalog-card__taste-tag {
     transition: none;
   }
