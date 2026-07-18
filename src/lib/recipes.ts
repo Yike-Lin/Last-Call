@@ -13,12 +13,16 @@ export type RecipeCard = {
   method: string;
   difficulty: string;
   estimatedAbv: string;
+  imageUrl: string | null;
+  imageAlt: string | null;
   ingredients: Array<{
     name: string;
     amount: string;
   }>;
   steps: string[];
 };
+
+const recipeImagesBucket = "recipe-images";
 
 const recipeSelect = `
   slug,
@@ -57,6 +61,15 @@ const recipeSelect = `
       label_en,
       label_zh
     )
+  ),
+  recipe_assets (
+    asset_type,
+    storage_path,
+    alt_text,
+    width,
+    height,
+    is_primary,
+    sort_order
   )
 ` as const;
 
@@ -103,7 +116,35 @@ function formatAmount(
   return amountValue === null ? unitCode : `${amountValue} ${unitCode}`;
 }
 
+function getRecipeImageUrl(storagePath: string | null) {
+  if (!storagePath) {
+    return null;
+  }
+
+  if (/^https?:\/\//i.test(storagePath)) {
+    return storagePath;
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "");
+
+  if (!supabaseUrl) {
+    return null;
+  }
+
+  const encodedPath = storagePath.split("/").map(encodeURIComponent).join("/");
+  return `${supabaseUrl}/storage/v1/object/public/${recipeImagesBucket}/${encodedPath}`;
+}
+
 function mapRecipe(row: PublishedRecipeRow): RecipeCard {
+  const primaryAsset =
+    [...row.recipe_assets]
+      .filter((asset) => asset.asset_type === "thumbnail" || asset.asset_type === "hero")
+      .sort(
+        (a, b) =>
+          Number(b.is_primary) - Number(a.is_primary) ||
+          a.sort_order - b.sort_order
+      )[0] ?? null;
+
   const ingredients = [...row.recipe_ingredients]
     .sort((a, b) => a.sort_order - b.sort_order)
     .map((item) => ({
@@ -140,6 +181,8 @@ function mapRecipe(row: PublishedRecipeRow): RecipeCard {
     difficulty: difficultyLabels[row.difficulty] ?? "待评估",
     estimatedAbv:
       row.estimated_abv === null ? "待测算" : `约 ${row.estimated_abv}%`,
+    imageUrl: getRecipeImageUrl(primaryAsset?.storage_path ?? null),
+    imageAlt: primaryAsset?.alt_text ?? null,
     ingredients,
     steps
   };

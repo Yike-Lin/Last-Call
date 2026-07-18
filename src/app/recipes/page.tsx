@@ -3,6 +3,8 @@ import { getPublishedRecipes } from "@/lib/recipes";
 
 type RecipesPageProps = {
   searchParams: Promise<{
+    mood?: string;
+    spirit?: string;
     filter?: string;
   }>;
 };
@@ -21,9 +23,13 @@ export default async function RecipesPage({ searchParams }: RecipesPageProps) {
     );
   }
 
-  const selectedFilter = recipes.some((recipe) => recipe.baseSpirit === params.filter)
-    ? params.filter!
-    : "全部";
+  const selectedSpirit = params.spirit ?? params.filter ?? "全部";
 
-  return <RecipeCatalog recipes={recipes} selectedFilter={selectedFilter} />;
+  return (
+    <RecipeCatalog
+      recipes={recipes}
+      selectedMood={params.mood ?? "全部"}
+      selectedSpirit={selectedSpirit}
+    />
+  );
 }
