@@ -31,8 +31,8 @@ export default async function RecipeDetailPage({ params }: RecipeDetailPageProps
           <div className="flex flex-wrap gap-2">
             <span className="pill">{recipe.baseSpirit}</span>
             {recipe.tags.map((tag) => (
-              <span key={tag} className="pill">
-                {tag}
+              <span key={tag.slug} className="pill">
+                {tag.label}
               </span>
             ))}
           </div>
