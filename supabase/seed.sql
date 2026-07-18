@@ -367,3 +367,33 @@ set
   source_category = excluded.source_category,
   retrieved_at = now(),
   rights_note = excluded.rights_note;
+
+insert into public.recipe_assets (
+  recipe_id,
+  asset_type,
+  storage_path,
+  alt_text,
+  width,
+  height,
+  is_primary,
+  sort_order
+)
+select
+  r.id,
+  'thumbnail',
+  'negroni/card.png',
+  '内格罗尼鸡尾酒，短杯盛装，红色酒液与橙皮装饰。',
+  2048,
+  1600,
+  true,
+  0
+from public.recipes r
+where r.slug = 'negroni'
+on conflict (storage_path) do update
+set
+  alt_text = excluded.alt_text,
+  width = excluded.width,
+  height = excluded.height,
+  is_primary = excluded.is_primary,
+  sort_order = excluded.sort_order,
+  updated_at = now();
