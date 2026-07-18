@@ -202,25 +202,45 @@ function getSpiritStage(baseSpiritCategory: string) {
 }
 
 function getBaseSpiritSummary(recipe: RecipeCard) {
-  const categories = recipe.baseSpirits
-    .map((spirit) => spirit.category)
-    .filter((category, index, source) =>
-      category !== "其他" && source.indexOf(category) === index
-    );
+  const spirits = recipe.baseSpirits.filter((spirit) => spirit.category !== "其他");
 
-  if (categories.length === 0) {
+  if (spirits.length === 0) {
     return recipe.baseSpiritCategory === "其他" ? "未分类" : recipe.baseSpiritCategory;
   }
 
-  if (categories.length === 1) {
-    return categories[0];
+  const primary = spirits[0];
+
+  if (spirits.length === 1) {
+    return primary.category;
   }
 
-  if (categories.length === 2) {
-    return `${categories[0]} / ${categories[1]}`;
+  if (spirits.length === 2) {
+    if (primary.ratio !== null && primary.ratio >= 0.65) {
+      return `${primary.category} +1`;
+    }
+
+    return `${spirits[0].category} / ${spirits[1].category}`;
   }
 
-  return `复合基酒 ${categories.length}款`;
+  if (primary.ratio !== null && primary.ratio >= 0.55) {
+    return `${primary.category} +${spirits.length - 1}`;
+  }
+
+  return `复合基酒 ${spirits.length}款`;
+}
+
+function getBaseSpiritTagStyle(recipe: RecipeCard) {
+  const primarySpirit =
+    recipe.baseSpirits.find((spirit) => spirit.category !== "其他") ?? null;
+  const category = primarySpirit?.category ?? recipe.baseSpiritCategory;
+  const stage = getSpiritStage(category);
+  const ratio = primarySpirit?.ratio ?? null;
+
+  return {
+    "--spirit-color": stage.accent,
+    "--spirit-ratio": ratio === null ? "0%" : `${Math.round(Math.min(1, Math.max(0, ratio)) * 100)}%`,
+    "--spirit-ratio-value": ratio === null ? 0 : Math.min(1, Math.max(0, ratio))
+  } as CSSProperties;
 }
 
 function updateRecipeUrl(mood: MoodFilter, spirit: SpiritFilter) {
@@ -330,7 +350,9 @@ export function RecipeCatalog({
       recipes.filter(
         (recipe) =>
           matchesMood(recipe, activeMood) &&
-          (activeSpirit === "全部" || recipe.baseSpiritCategory === activeSpirit) &&
+          (activeSpirit === "全部" ||
+            recipe.baseSpiritCategory === activeSpirit ||
+            recipe.baseSpirits.some((spirit) => spirit.category === activeSpirit)) &&
           matchesSearch(recipe, deferredSearchQuery)
       ),
     [activeMood, activeSpirit, deferredSearchQuery, recipes]
@@ -469,8 +491,11 @@ export function RecipeCatalog({
                       <span
                         className="recipe-catalog-card__spirit-tag"
                         aria-label={`基酒：${baseSpiritSummary}`}
+                        style={getBaseSpiritTagStyle(recipe)}
                       >
-                        {baseSpiritSummary}
+                        <span className="recipe-catalog-card__spirit-tag-text">
+                          {baseSpiritSummary}
+                        </span>
                       </span>
                     </span>
 

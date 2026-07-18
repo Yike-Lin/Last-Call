@@ -33,6 +33,8 @@ export type RecipeCard = {
 export type RecipeBaseSpirit = {
   label: string;
   category: string;
+  amountMl: number | null;
+  ratio: number | null;
 };
 
 export type RecipeTag = {
@@ -69,6 +71,7 @@ const recipeSelect = `
     role,
     amount_value,
     display_amount,
+    normalized_ml,
     unit_code,
     sort_order,
     ingredient:ingredients!recipe_ingredients_ingredient_id_fkey (
@@ -183,6 +186,18 @@ function getBaseSpiritCategory(slug: string | null | undefined, label: string) {
   );
 }
 
+function getIngredientAmountMl(
+  normalizedMl: number | null,
+  amountValue: number | null,
+  unitCode: string
+) {
+  if (normalizedMl !== null) {
+    return normalizedMl;
+  }
+
+  return unitCode === "ml" ? amountValue : null;
+}
+
 function getBaseSpiritRows(row: PublishedRecipeRow, fallbackLabel: string) {
   const spirits = [...row.recipe_ingredients]
     .filter(
@@ -196,15 +211,69 @@ function getBaseSpiritRows(row: PublishedRecipeRow, fallbackLabel: string) {
 
       return {
         label,
-        category: getBaseSpiritCategory(item.ingredient.slug, label)
+        category: getBaseSpiritCategory(item.ingredient.slug, label),
+        amountMl: getIngredientAmountMl(
+          item.normalized_ml,
+          item.amount_value,
+          item.unit_code
+        ),
+        sortOrder: item.sort_order
       };
     })
     .filter((spirit) => spirit.category !== "其他");
 
-  const uniqueSpirits = spirits.filter(
-    (spirit, index, source) =>
-      source.findIndex((item) => item.category === spirit.category) === index
+  const groupedSpirits = [...spirits]
+    .reduce<Array<RecipeBaseSpirit & { sortOrder: number }>>((groups, spirit) => {
+      const existing = groups.find((item) => item.category === spirit.category);
+
+      if (existing) {
+        existing.amountMl =
+          existing.amountMl === null && spirit.amountMl === null
+            ? null
+            : (existing.amountMl ?? 0) + (spirit.amountMl ?? 0);
+        existing.sortOrder = Math.min(existing.sortOrder, spirit.sortOrder);
+        return groups;
+      }
+
+      groups.push({
+        label: spirit.label,
+        category: spirit.category,
+        amountMl: spirit.amountMl,
+        ratio: null,
+        sortOrder: spirit.sortOrder
+      });
+      return groups;
+    }, [])
+    .sort((a, b) => a.sortOrder - b.sortOrder);
+
+  const totalKnownLiquidAmount = row.recipe_ingredients.reduce(
+    (total, item) =>
+      total +
+      (getIngredientAmountMl(
+        item.normalized_ml,
+        item.amount_value,
+        item.unit_code
+      ) ?? 0),
+    0
   );
+
+  const uniqueSpirits = groupedSpirits
+    .map((spirit) => ({
+      label: spirit.label,
+      category: spirit.category,
+      amountMl: spirit.amountMl,
+      ratio:
+        totalKnownLiquidAmount > 0 && spirit.amountMl !== null
+          ? spirit.amountMl / totalKnownLiquidAmount
+          : groupedSpirits.length === 1
+            ? 1
+          : null
+    }))
+    .sort(
+      (a, b) =>
+        (b.ratio ?? 0) - (a.ratio ?? 0) ||
+        (b.amountMl ?? 0) - (a.amountMl ?? 0)
+    );
 
   if (uniqueSpirits.length > 0) {
     return uniqueSpirits;
@@ -213,7 +282,9 @@ function getBaseSpiritRows(row: PublishedRecipeRow, fallbackLabel: string) {
   return [
     {
       label: fallbackLabel,
-      category: getBaseSpiritCategory(undefined, fallbackLabel)
+      category: getBaseSpiritCategory(undefined, fallbackLabel),
+      amountMl: null,
+      ratio: 1
     }
   ].filter((spirit) => spirit.category !== "其他");
 }
