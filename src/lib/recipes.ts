@@ -7,8 +7,15 @@ export type RecipeCard = {
   slug: string;
   name: string;
   baseSpirit: string;
+  baseSpiritCategory: string;
   summary: string;
-  tags: string[];
+  tags: RecipeTag[];
+  balance: {
+    sweet: number;
+    sour: number;
+    bitter: number;
+    spirit: number;
+  };
   glassware: string;
   method: string;
   difficulty: string;
@@ -22,6 +29,12 @@ export type RecipeCard = {
   steps: string[];
 };
 
+export type RecipeTag = {
+  slug: string;
+  label: string;
+  type: string;
+};
+
 const recipeImagesBucket = "recipe-images";
 
 const recipeSelect = `
@@ -33,7 +46,12 @@ const recipeSelect = `
   difficulty,
   primary_method,
   estimated_abv,
+  balance_sweet,
+  balance_sour,
+  balance_bitter,
+  balance_spirit,
   primary_spirit:ingredients!recipes_primary_spirit_id_fkey (
+    slug,
     name_en,
     name_zh
   ),
@@ -58,8 +76,10 @@ const recipeSelect = `
   ),
   recipe_tags (
     tags (
+      slug,
       label_en,
-      label_zh
+      label_zh,
+      type
     )
   ),
   recipe_assets (
@@ -95,6 +115,15 @@ const methodLabels: Record<string, string> = {
   shake: "摇匀",
   stir: "搅拌"
 };
+
+const baseSpiritCategoryRules = [
+  { label: "金酒", keywords: ["gin", "金酒", "杜松子"] },
+  { label: "朗姆", keywords: ["rum", "朗姆"] },
+  { label: "龙舌兰", keywords: ["tequila", "mezcal", "龙舌兰", "梅斯卡尔"] },
+  { label: "伏特加", keywords: ["vodka", "伏特加"] },
+  { label: "威士忌", keywords: ["whiskey", "whisky", "bourbon", "rye", "威士忌", "波本"] },
+  { label: "白兰地", keywords: ["brandy", "cognac", "armagnac", "白兰地", "干邑"] }
+];
 
 function localizedValue(zh: string | null, en: string | null) {
   return zh?.trim() || en?.trim() || "待补充";
@@ -135,6 +164,16 @@ function getRecipeImageUrl(storagePath: string | null) {
   return `${supabaseUrl}/storage/v1/object/public/${recipeImagesBucket}/${encodedPath}`;
 }
 
+function getBaseSpiritCategory(slug: string | null | undefined, label: string) {
+  const source = `${slug ?? ""} ${label}`.toLocaleLowerCase();
+
+  return (
+    baseSpiritCategoryRules.find(({ keywords }) =>
+      keywords.some((keyword) => source.includes(keyword.toLocaleLowerCase()))
+    )?.label ?? "其他"
+  );
+}
+
 function mapRecipe(row: PublishedRecipeRow): RecipeCard {
   const primaryAsset =
     [...row.recipe_assets]
@@ -162,18 +201,29 @@ function mapRecipe(row: PublishedRecipeRow): RecipeCard {
       localizedValue(step.instruction_zh, step.instruction_en)
     );
 
-  const tags = row.recipe_tags.map(({ tags }) =>
-    localizedValue(tags.label_zh, tags.label_en)
-  );
+  const tags = row.recipe_tags.map(({ tags }) => ({
+    slug: tags.slug,
+    label: localizedValue(tags.label_zh, tags.label_en),
+    type: tags.type
+  }));
+
+  const baseSpirit = row.primary_spirit
+    ? localizedValue(row.primary_spirit.name_zh, row.primary_spirit.name_en)
+    : "未分类";
 
   return {
     slug: row.slug,
     name: bilingualName(row.name_zh, row.name_en),
-    baseSpirit: row.primary_spirit
-      ? localizedValue(row.primary_spirit.name_zh, row.primary_spirit.name_en)
-      : "未分类",
+    baseSpirit,
+    baseSpiritCategory: getBaseSpiritCategory(row.primary_spirit?.slug, baseSpirit),
     summary: localizedValue(row.description_zh, row.description_en),
     tags,
+    balance: {
+      sweet: row.balance_sweet,
+      sour: row.balance_sour,
+      bitter: row.balance_bitter,
+      spirit: row.balance_spirit
+    },
     glassware: row.glassware
       ? localizedValue(row.glassware.name_zh, row.glassware.name_en)
       : "待确认",
