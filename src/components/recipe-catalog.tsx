@@ -184,6 +184,7 @@ function matchesSearch(recipe: RecipeCard, query: string) {
     recipe.baseSpiritCategory,
     recipe.method,
     recipe.estimatedAbv,
+    ...recipe.baseSpirits.flatMap((spirit) => [spirit.label, spirit.category]),
     ...recipe.ingredients.map((ingredient) => ingredient.name),
     ...recipe.tags.map(getTagLabel)
   ]
@@ -198,6 +199,28 @@ function getSpiritStage(baseSpiritCategory: string) {
     spiritStages.find(({ category }) => category === baseSpiritCategory) ??
     { stage: "#e6e1d7", accent: "#707a58" }
   );
+}
+
+function getBaseSpiritSummary(recipe: RecipeCard) {
+  const categories = recipe.baseSpirits
+    .map((spirit) => spirit.category)
+    .filter((category, index, source) =>
+      category !== "其他" && source.indexOf(category) === index
+    );
+
+  if (categories.length === 0) {
+    return recipe.baseSpiritCategory === "其他" ? "未分类" : recipe.baseSpiritCategory;
+  }
+
+  if (categories.length === 1) {
+    return categories[0];
+  }
+
+  if (categories.length === 2) {
+    return `${categories[0]} / ${categories[1]}`;
+  }
+
+  return `复合基酒 ${categories.length}款`;
 }
 
 function updateRecipeUrl(mood: MoodFilter, spirit: SpiritFilter) {
@@ -402,7 +425,8 @@ export function RecipeCatalog({
         <section className="recipe-catalog-products" aria-live="polite" aria-label="配方目录">
           <AnimatePresence initial={false} mode="popLayout">
             {visibleRecipes.map((recipe) => {
-              const stage = getSpiritStage(recipe.baseSpiritCategory);
+              const stage = getSpiritStage(recipe.baseSpirits[0]?.category ?? recipe.baseSpiritCategory);
+              const baseSpiritSummary = getBaseSpiritSummary(recipe);
               const tasteTags = getDisplayTasteTags(recipe);
               const imageSource = recipe.imageUrl;
 
@@ -442,6 +466,12 @@ export function RecipeCatalog({
 
                     <span className="recipe-catalog-card__heading">
                       <h2>{recipe.name}</h2>
+                      <span
+                        className="recipe-catalog-card__spirit-tag"
+                        aria-label={`基酒：${baseSpiritSummary}`}
+                      >
+                        {baseSpiritSummary}
+                      </span>
                     </span>
 
                     <span className="recipe-catalog-card__tags" aria-label="口味标签">
