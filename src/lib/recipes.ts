@@ -8,6 +8,7 @@ export type RecipeCard = {
   name: string;
   baseSpirit: string;
   baseSpiritCategory: string;
+  baseSpirits: RecipeBaseSpirit[];
   summary: string;
   tags: RecipeTag[];
   balance: {
@@ -27,6 +28,11 @@ export type RecipeCard = {
     amount: string;
   }>;
   steps: string[];
+};
+
+export type RecipeBaseSpirit = {
+  label: string;
+  category: string;
 };
 
 export type RecipeTag = {
@@ -60,13 +66,16 @@ const recipeSelect = `
     name_zh
   ),
   recipe_ingredients (
+    role,
     amount_value,
     display_amount,
     unit_code,
     sort_order,
     ingredient:ingredients!recipe_ingredients_ingredient_id_fkey (
+      slug,
       name_en,
-      name_zh
+      name_zh,
+      category
     )
   ),
   recipe_steps (
@@ -174,6 +183,41 @@ function getBaseSpiritCategory(slug: string | null | undefined, label: string) {
   );
 }
 
+function getBaseSpiritRows(row: PublishedRecipeRow, fallbackLabel: string) {
+  const spirits = [...row.recipe_ingredients]
+    .filter(
+      (item) =>
+        item.role === "base" ||
+        item.ingredient.category === "base-spirit"
+    )
+    .sort((a, b) => a.sort_order - b.sort_order)
+    .map((item) => {
+      const label = localizedValue(item.ingredient.name_zh, item.ingredient.name_en);
+
+      return {
+        label,
+        category: getBaseSpiritCategory(item.ingredient.slug, label)
+      };
+    })
+    .filter((spirit) => spirit.category !== "其他");
+
+  const uniqueSpirits = spirits.filter(
+    (spirit, index, source) =>
+      source.findIndex((item) => item.category === spirit.category) === index
+  );
+
+  if (uniqueSpirits.length > 0) {
+    return uniqueSpirits;
+  }
+
+  return [
+    {
+      label: fallbackLabel,
+      category: getBaseSpiritCategory(undefined, fallbackLabel)
+    }
+  ].filter((spirit) => spirit.category !== "其他");
+}
+
 function mapRecipe(row: PublishedRecipeRow): RecipeCard {
   const primaryAsset =
     [...row.recipe_assets]
@@ -210,12 +254,15 @@ function mapRecipe(row: PublishedRecipeRow): RecipeCard {
   const baseSpirit = row.primary_spirit
     ? localizedValue(row.primary_spirit.name_zh, row.primary_spirit.name_en)
     : "未分类";
+  const baseSpiritCategory = getBaseSpiritCategory(row.primary_spirit?.slug, baseSpirit);
+  const baseSpirits = getBaseSpiritRows(row, baseSpirit);
 
   return {
     slug: row.slug,
     name: bilingualName(row.name_zh, row.name_en),
     baseSpirit,
-    baseSpiritCategory: getBaseSpiritCategory(row.primary_spirit?.slug, baseSpirit),
+    baseSpiritCategory,
+    baseSpirits,
     summary: localizedValue(row.description_zh, row.description_en),
     tags,
     balance: {
