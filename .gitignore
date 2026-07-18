@@ -17,10 +17,8 @@ docs
 # Recipe image workspace.
 # The site reads recipe images from Supabase Storage; keep local originals out of Git.
 assets/recipe-images/source/**
-assets/recipe-images/working/**
 assets/recipe-images/upload/**
 !assets/recipe-images/source/.gitkeep
-!assets/recipe-images/working/.gitkeep
 !assets/recipe-images/upload/.gitkeep
 
 # Temporary AI exports are local handoff files, not deploy assets.

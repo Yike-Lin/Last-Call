@@ -290,12 +290,15 @@ set
 
 insert into public.tags (slug, label_en, label_zh, type)
 values
-  ('bitter', 'Bitter', '苦感', 'flavor'),
+  ('bitter', 'Bittersweet', '苦甜', 'flavor'),
   ('herbal', 'Herbal', '草本', 'flavor'),
   ('citrus', 'Citrus', '柑橘', 'flavor'),
+  ('sour', 'Sour', '酸爽', 'flavor'),
   ('refreshing', 'Refreshing', '清爽', 'flavor'),
   ('mint', 'Mint', '薄荷', 'flavor'),
-  ('spirit-forward', 'Spirit-forward', '酒体前置', 'style'),
+  ('sparkling', 'Sparkling', '气泡', 'flavor'),
+  ('orange', 'Orange aroma', '橙香', 'flavor'),
+  ('spirit-forward', 'Spirit-forward', '酒感', 'style'),
   ('short-drink', 'Short drink', '短饮', 'style'),
   ('long-drink', 'Long drink', '长饮', 'style'),
   ('slow-sipping', 'Slow sipping', '慢饮', 'occasion')
@@ -311,13 +314,16 @@ with tag_rows (recipe_slug, tag_slug) as (
     ('negroni', 'herbal'),
     ('negroni', 'spirit-forward'),
     ('negroni', 'short-drink'),
+    ('margarita', 'sour'),
     ('margarita', 'citrus'),
     ('margarita', 'refreshing'),
     ('margarita', 'short-drink'),
     ('mojito', 'mint'),
     ('mojito', 'refreshing'),
+    ('mojito', 'sparkling'),
     ('mojito', 'long-drink'),
     ('old-fashioned', 'spirit-forward'),
+    ('old-fashioned', 'orange'),
     ('old-fashioned', 'slow-sipping'),
     ('old-fashioned', 'short-drink')
 )
@@ -368,6 +374,19 @@ set
   retrieved_at = now(),
   rights_note = excluded.rights_note;
 
+with asset_rows (
+  recipe_slug,
+  storage_path,
+  alt_text,
+  width,
+  height
+) as (
+  values
+    ('negroni', 'negroni/card.png', '内格罗尼鸡尾酒，短杯盛装，红色酒液与橙皮装饰。', 1168, 912),
+    ('margarita', 'margarita/card.png', '玛格丽特鸡尾酒，碟形香槟杯盛装，浅青柠黄色酒液、半圈盐边与青柠装饰。', 1168, 912),
+    ('mojito', 'mojito/card.png', '莫吉托鸡尾酒，海波杯盛装，碎冰、薄荷、青柠与清透气泡。', 1168, 912),
+    ('old-fashioned', 'old-fashioned/card.png', '古典鸡尾酒，厚底古典杯盛装，琥珀色酒液、大冰块与橙皮装饰。', 1168, 912)
+)
 insert into public.recipe_assets (
   recipe_id,
   asset_type,
@@ -381,14 +400,14 @@ insert into public.recipe_assets (
 select
   r.id,
   'thumbnail',
-  'negroni/card.png',
-  '内格罗尼鸡尾酒，短杯盛装，红色酒液与橙皮装饰。',
-  2048,
-  1600,
+  v.storage_path,
+  v.alt_text,
+  v.width,
+  v.height,
   true,
   0
-from public.recipes r
-where r.slug = 'negroni'
+from asset_rows v
+join public.recipes r on r.slug = v.recipe_slug
 on conflict (storage_path) do update
 set
   alt_text = excluded.alt_text,
