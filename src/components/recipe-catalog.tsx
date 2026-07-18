@@ -5,17 +5,7 @@ import { useDeferredValue, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-
-type RecipeCard = {
-  slug: string;
-  name: string;
-  baseSpirit: string;
-  tags: string[];
-  method: string;
-  estimatedAbv: string;
-  imageUrl: string | null;
-  imageAlt: string | null;
-};
+import type { RecipeCard, RecipeTag } from "@/lib/recipes";
 
 type RecipeCatalogProps = {
   recipes: RecipeCard[];
@@ -23,35 +13,111 @@ type RecipeCatalogProps = {
   selectedSpirit: string;
 };
 
-const moodFilters = ["全部", "清爽", "苦甜", "果香", "烈", "低度"] as const;
+const moodFilterRules = [
+  { label: "全部", slugs: [], labels: [] },
+  { label: "清爽", slugs: ["refreshing", "mint", "sparkling"], labels: ["清爽", "薄荷", "气泡"] },
+  { label: "酸爽", slugs: ["sour", "acidic", "citrus"], labels: ["酸爽", "柑橘"] },
+  { label: "苦甜", slugs: ["bitter", "bittersweet"], labels: ["苦甜", "苦感"] },
+  { label: "草本", slugs: ["herbal", "mint"], labels: ["草本", "薄荷"] },
+  { label: "果香", slugs: ["fruit", "berry", "apple", "pineapple", "peach", "grapefruit"], labels: ["果香", "莓", "苹果", "菠萝", "桃", "葡萄柚"] },
+  { label: "香料", slugs: ["spice", "spiced", "aromatic", "vanilla", "oak"], labels: ["香料", "辛香", "香草", "橡木"] },
+  { label: "酒感", slugs: ["spirit-forward"], labels: ["酒感", "酒体前置"] }
+] as const;
+
+const baseSpiritFilters = ["全部", "金酒", "朗姆", "龙舌兰", "伏特加", "威士忌", "白兰地"] as const;
 const pageSize = 24;
 
-type MoodFilter = (typeof moodFilters)[number];
-
-const moodKeywords: Partial<Record<MoodFilter, string[]>> = {
-  清爽: ["清爽", "明快", "薄荷", "长饮", "气泡"],
-  苦甜: ["苦感", "苦甜", "草本", "甜", "可可"],
-  果香: ["柑橘", "橙香", "果香", "莓", "苹果", "菠萝", "葡萄柚"]
-};
+type MoodFilter = (typeof moodFilterRules)[number]["label"];
+type SpiritFilter = (typeof baseSpiritFilters)[number];
+type MoodFilterRule = (typeof moodFilterRules)[number];
 
 const spiritStages: Array<{
-  keywords: string[];
+  category: string;
   stage: string;
   accent: string;
 }> = [
-  { keywords: ["龙舌兰"], stage: "#e8ddd3", accent: "#c95c40" },
-  { keywords: ["朗姆"], stage: "#dce5e2", accent: "#55716f" },
-  { keywords: ["金酒"], stage: "#dde2d5", accent: "#707a58" },
-  { keywords: ["威士忌"], stage: "#e4d6cc", accent: "#a84f38" }
+  { category: "金酒", stage: "#dde2d5", accent: "#707a58" },
+  { category: "朗姆", stage: "#dce5e2", accent: "#55716f" },
+  { category: "龙舌兰", stage: "#e8ddd3", accent: "#c95c40" },
+  { category: "伏特加", stage: "#e7e8e3", accent: "#89918e" },
+  { category: "威士忌", stage: "#e4d6cc", accent: "#a84f38" },
+  { category: "白兰地", stage: "#ead8ca", accent: "#9f6446" }
 ];
 
-function normalizeMood(value: string): MoodFilter {
-  return moodFilters.includes(value as MoodFilter) ? (value as MoodFilter) : "全部";
+const spiritAliases: Record<Exclude<SpiritFilter, "全部">, string[]> = {
+  金酒: ["金酒", "杜松子酒", "gin"],
+  朗姆: ["朗姆", "rum"],
+  龙舌兰: ["龙舌兰", "tequila", "mezcal", "梅斯卡尔"],
+  伏特加: ["伏特加", "vodka"],
+  威士忌: ["威士忌", "波本", "bourbon", "rye", "whiskey", "whisky"],
+  白兰地: ["白兰地", "干邑", "brandy", "cognac", "armagnac"]
+};
+
+const tagDisplayLabels: Record<string, string> = {
+  bitter: "苦甜",
+  bittersweet: "苦甜",
+  sour: "酸爽",
+  acidic: "酸爽",
+  refreshing: "清爽",
+  herbal: "草本",
+  citrus: "柑橘",
+  mint: "薄荷",
+  sparkling: "气泡",
+  orange: "橙香",
+  spice: "香料",
+  spiced: "香料",
+  "spirit-forward": "酒感",
+  "slow-sipping": "慢饮"
+};
+
+const hiddenCardTagSlugs = new Set(["short-drink", "long-drink"]);
+
+function normalizeMood(value: string, availableFilters: MoodFilter[]): MoodFilter {
+  return availableFilters.includes(value as MoodFilter) ? (value as MoodFilter) : "全部";
 }
 
-function parseAbv(value: string) {
-  const match = value.match(/\d+(?:\.\d+)?/);
-  return match ? Number(match[0]) : null;
+function normalizeSpirit(value: string): SpiritFilter {
+  if (baseSpiritFilters.includes(value as SpiritFilter)) {
+    return value as SpiritFilter;
+  }
+
+  const normalizedValue = value.toLocaleLowerCase();
+  const matchedSpirit = Object.entries(spiritAliases).find(([, aliases]) =>
+    aliases.some((alias) => normalizedValue.includes(alias.toLocaleLowerCase()))
+  );
+
+  return (matchedSpirit?.[0] as SpiritFilter | undefined) ?? "全部";
+}
+
+function getTagLabel(tag: RecipeTag) {
+  return tagDisplayLabels[tag.slug] ?? tag.label;
+}
+
+function getRecipeText(recipe: RecipeCard) {
+  return [
+    recipe.name,
+    recipe.summary,
+    recipe.baseSpirit,
+    recipe.baseSpiritCategory,
+    ...recipe.ingredients.map((ingredient) => ingredient.name),
+    ...recipe.steps
+  ]
+    .join(" ")
+    .toLocaleLowerCase();
+}
+
+function recipeHasTag(recipe: RecipeCard, rule: MoodFilterRule) {
+  const slugs = rule.slugs as readonly string[];
+  const labels = rule.labels as readonly string[];
+
+  return recipe.tags.some((tag) => {
+    const label = getTagLabel(tag);
+
+    return (
+      slugs.includes(tag.slug) ||
+      labels.some((keyword) => label.includes(keyword))
+    );
+  });
 }
 
 function matchesMood(recipe: RecipeCard, mood: MoodFilter) {
@@ -59,18 +125,35 @@ function matchesMood(recipe: RecipeCard, mood: MoodFilter) {
     return true;
   }
 
-  const abv = parseAbv(recipe.estimatedAbv);
-
-  if (mood === "烈") {
-    return abv !== null && abv >= 20;
+  if (mood === "清爽") {
+    return recipeHasTag(recipe, moodFilterRules[1]) || (recipe.balance.sour >= 3 && recipe.balance.spirit <= 2);
   }
 
-  if (mood === "低度") {
-    return abv !== null && abv <= 15;
+  if (mood === "酸爽") {
+    return recipeHasTag(recipe, moodFilterRules[2]) || recipe.balance.sour >= 4;
   }
 
-  const keywords = moodKeywords[mood] ?? [];
-  return recipe.tags.some((tag) => keywords.some((keyword) => tag.includes(keyword)));
+  if (mood === "苦甜") {
+    return recipeHasTag(recipe, moodFilterRules[3]) || recipe.balance.bitter >= 3;
+  }
+
+  if (mood === "草本") {
+    return recipeHasTag(recipe, moodFilterRules[4]);
+  }
+
+  if (mood === "果香") {
+    return recipeHasTag(recipe, moodFilterRules[5]);
+  }
+
+  if (mood === "香料") {
+    return recipeHasTag(recipe, moodFilterRules[6]);
+  }
+
+  if (mood === "酒感") {
+    return recipeHasTag(recipe, moodFilterRules[7]) || recipe.balance.spirit >= 4;
+  }
+
+  return false;
 }
 
 function matchesSearch(recipe: RecipeCard, query: string) {
@@ -80,10 +163,13 @@ function matchesSearch(recipe: RecipeCard, query: string) {
 
   const searchableText = [
     recipe.name,
+    recipe.summary,
     recipe.baseSpirit,
+    recipe.baseSpiritCategory,
     recipe.method,
     recipe.estimatedAbv,
-    ...recipe.tags
+    ...recipe.ingredients.map((ingredient) => ingredient.name),
+    ...recipe.tags.map(getTagLabel)
   ]
     .join(" ")
     .toLocaleLowerCase();
@@ -91,15 +177,14 @@ function matchesSearch(recipe: RecipeCard, query: string) {
   return searchableText.includes(query);
 }
 
-function getSpiritStage(baseSpirit: string) {
+function getSpiritStage(baseSpiritCategory: string) {
   return (
-    spiritStages.find(({ keywords }) =>
-      keywords.some((keyword) => baseSpirit.includes(keyword))
-    ) ?? { stage: "#e6e1d7", accent: "#707a58" }
+    spiritStages.find(({ category }) => category === baseSpiritCategory) ??
+    { stage: "#e6e1d7", accent: "#707a58" }
   );
 }
 
-function updateRecipeUrl(mood: MoodFilter, spirit: string) {
+function updateRecipeUrl(mood: MoodFilter, spirit: SpiritFilter) {
   const params = new URLSearchParams();
 
   if (mood !== "全部") {
@@ -114,18 +199,72 @@ function updateRecipeUrl(mood: MoodFilter, spirit: string) {
   window.history.replaceState(window.history.state, "", query ? `/recipes?${query}` : "/recipes");
 }
 
+function getAvailableMoodFilters(recipes: RecipeCard[]) {
+  return moodFilterRules
+    .filter((rule) => rule.label === "全部" || recipes.some((recipe) => matchesMood(recipe, rule.label)))
+    .map((rule) => rule.label);
+}
+
+function getDisplayTasteTags(recipe: RecipeCard) {
+  const labels: string[] = [];
+  const recipeText = getRecipeText(recipe);
+
+  const addLabel = (label: string) => {
+    if (!labels.includes(label)) {
+      labels.push(label);
+    }
+  };
+
+  if (recipe.balance.sour >= 4) {
+    addLabel("酸爽");
+  }
+
+  if (recipe.balance.bitter >= 3) {
+    addLabel("苦甜");
+  }
+
+  if (recipe.balance.spirit >= 5) {
+    addLabel("酒感");
+  }
+
+  recipe.tags.forEach((tag) => {
+    if (hiddenCardTagSlugs.has(tag.slug)) {
+      return;
+    }
+
+    const label = getTagLabel(tag);
+
+    if (label === "酒感" && recipe.balance.spirit < 5) {
+      return;
+    }
+
+    addLabel(label);
+  });
+
+  if (recipeText.includes("苏打") || recipeText.includes("气泡") || recipeText.includes("soda")) {
+    addLabel("气泡");
+  }
+
+  if (recipeText.includes("橙皮") || recipeText.includes("橙香") || recipeText.includes("orange")) {
+    addLabel("橙香");
+  }
+
+  if (recipe.balance.spirit >= 4) {
+    addLabel("酒感");
+  }
+
+  return labels.slice(0, 3);
+}
+
 export function RecipeCatalog({
   recipes,
   selectedMood,
   selectedSpirit
 }: RecipeCatalogProps) {
   const prefersReducedMotion = useReducedMotion();
-  const baseSpirits = useMemo(
-    () => ["全部", ...new Set(recipes.map((recipe) => recipe.baseSpirit))],
-    [recipes]
-  );
-  const normalizedMood = normalizeMood(selectedMood);
-  const normalizedSpirit = baseSpirits.includes(selectedSpirit) ? selectedSpirit : "全部";
+  const availableMoodFilters = useMemo(() => getAvailableMoodFilters(recipes), [recipes]);
+  const normalizedMood = normalizeMood(selectedMood, availableMoodFilters);
+  const normalizedSpirit = normalizeSpirit(selectedSpirit);
   const [activeMood, setActiveMood] = useState<MoodFilter>(normalizedMood);
   const [activeSpirit, setActiveSpirit] = useState(normalizedSpirit);
   const [searchQuery, setSearchQuery] = useState("");
@@ -137,14 +276,14 @@ export function RecipeCatalog({
       recipes.filter(
         (recipe) =>
           matchesMood(recipe, activeMood) &&
-          (activeSpirit === "全部" || recipe.baseSpirit === activeSpirit) &&
+          (activeSpirit === "全部" || recipe.baseSpiritCategory === activeSpirit) &&
           matchesSearch(recipe, deferredSearchQuery)
       ),
     [activeMood, activeSpirit, deferredSearchQuery, recipes]
   );
   const visibleRecipes = filteredRecipes.slice(0, visibleLimit);
 
-  const updateFilters = (mood: MoodFilter, spirit: string) => {
+  const updateFilters = (mood: MoodFilter, spirit: SpiritFilter) => {
     setActiveMood(mood);
     setActiveSpirit(spirit);
     setVisibleLimit(pageSize);
@@ -177,7 +316,7 @@ export function RecipeCatalog({
             <span className="recipe-catalog-filter-label">口味</span>
             <div className="recipe-catalog-filter-main">
               <div className="recipe-catalog-filter-options" role="group" aria-label="按口味筛选">
-                {moodFilters.map((mood) => (
+                {availableMoodFilters.map((mood) => (
                   <button
                     key={mood}
                     className={mood === activeMood ? "is-active" : undefined}
@@ -210,7 +349,7 @@ export function RecipeCatalog({
             <span className="recipe-catalog-filter-label">基酒</span>
             <div className="recipe-catalog-filter-main">
               <div className="recipe-catalog-filter-options" role="group" aria-label="按基酒筛选">
-                {baseSpirits.map((spirit) => (
+                {baseSpiritFilters.map((spirit) => (
                   <button
                     key={spirit}
                     className={spirit === activeSpirit ? "is-active" : undefined}
@@ -232,8 +371,8 @@ export function RecipeCatalog({
         <section className="recipe-catalog-products" aria-live="polite" aria-label="配方目录">
           <AnimatePresence initial={false} mode="popLayout">
             {visibleRecipes.map((recipe) => {
-              const stage = getSpiritStage(recipe.baseSpirit);
-              const flavor = recipe.tags[0] ?? "经典";
+              const stage = getSpiritStage(recipe.baseSpiritCategory);
+              const tasteTags = getDisplayTasteTags(recipe);
               const imageSource = recipe.imageUrl;
 
               return (
@@ -272,18 +411,14 @@ export function RecipeCatalog({
 
                     <span className="recipe-catalog-card__heading">
                       <h2>{recipe.name}</h2>
-                      <span className="recipe-catalog-card__flavor">{flavor}</span>
                     </span>
 
-                    <span
-                      className="recipe-catalog-card__spec"
-                      aria-label={`${recipe.baseSpirit}，${recipe.method}，${recipe.estimatedAbv}`}
-                    >
-                      <span>{recipe.baseSpirit}</span>
-                      <span aria-hidden="true">·</span>
-                      <span>{recipe.method}</span>
-                      <span aria-hidden="true">·</span>
-                      <span>{recipe.estimatedAbv.replace("约 ", "")}</span>
+                    <span className="recipe-catalog-card__tags" aria-label="口味标签">
+                      {tasteTags.map((tag) => (
+                        <span key={tag} className="recipe-catalog-card__taste-tag">
+                          {tag}
+                        </span>
+                      ))}
                     </span>
                   </Link>
                 </motion.article>
