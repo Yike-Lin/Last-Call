@@ -1,16 +1,15 @@
-# Recipe Images
+# 配方图片
 
-Local recipe images are working files. The website serves recipe images from Supabase Storage and stores only asset metadata in `public.recipe_assets`.
+本地配方图片只作为工作文件和备份文件使用。网站正式展示的配方图片来自 Supabase Storage，数据库只在 `public.recipe_assets` 里保存图片路径和元信息。
 
-## Directories
+## 目录说明
 
-- `source/`: original high-resolution exports or references. Not committed.
-- `working/`: crops, edits, layered files, and experiments. Not committed.
-- `upload/`: web-ready files prepared for Supabase Storage. Not committed.
+- `source/`：原始高清图、AI 生成原图、参考图或备份图。不提交到 Git。
+- `upload/`：已经裁剪、压缩、命名好，准备上传到 Supabase Storage 的网页成品图。不提交到 Git。
 
-Keep code, migrations, seed data, and upload scripts in Git. Keep image binaries in Storage or external backup unless a specific static image must ship with the app.
+代码、数据库迁移、seed 数据和上传脚本需要提交到 Git。图片二进制文件默认不要提交到 Git，正式资源放在 Supabase Storage，本地只保留必要备份。
 
-## Upload Example
+## 上传示例
 
 ```powershell
 node scripts/upload-recipe-asset.mjs negroni "assets/recipe-images/upload/negroni-card.png" "negroni/card.png" "内格罗尼鸡尾酒，短杯盛装，红色酒液与橙皮装饰。" 2048 1600 thumbnail
