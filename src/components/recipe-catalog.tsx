@@ -70,6 +70,22 @@ const tagDisplayLabels: Record<string, string> = {
   "slow-sipping": "慢饮"
 };
 
+const tasteTagTones: Record<string, { paper: string; border: string; ink: string }> = {
+  酸爽: { paper: "#dce5e2", border: "#9fb4ad", ink: "#2f504c" },
+  柑橘: { paper: "#efd0b4", border: "#d69066", ink: "#733423" },
+  清爽: { paper: "#dde2d5", border: "#9da883", ink: "#3f4a31" },
+  苦甜: { paper: "#e8c0b2", border: "#c95c40", ink: "#642b1f" },
+  草本: { paper: "#dfe5d4", border: "#707a58", ink: "#39422d" },
+  薄荷: { paper: "#d9e7dc", border: "#81a783", ink: "#31523a" },
+  气泡: { paper: "#e2ebe8", border: "#9ab6b1", ink: "#385753" },
+  橙香: { paper: "#edc7a8", border: "#c95c40", ink: "#743822" },
+  果香: { paper: "#ead2c9", border: "#c98270", ink: "#6b3930" },
+  香料: { paper: "#e6d0c0", border: "#a56d50", ink: "#5a3428" },
+  酒感: { paper: "#e2d4c9", border: "#a76a4d", ink: "#57372a" },
+  慢饮: { paper: "#e7ddd2", border: "#9a7d65", ink: "#514235" }
+};
+
+const tasteTagTilts = ["-0.7deg", "0.45deg", "-0.35deg"];
 const hiddenCardTagSlugs = new Set(["short-drink", "long-drink"]);
 
 function normalizeMood(value: string, availableFilters: MoodFilter[]): MoodFilter {
@@ -256,6 +272,21 @@ function getDisplayTasteTags(recipe: RecipeCard) {
   return labels.slice(0, 3);
 }
 
+function getTasteTagStyle(label: string, index: number) {
+  const tone = tasteTagTones[label] ?? {
+    paper: "#efe5db",
+    border: "#b99c88",
+    ink: "#514136"
+  };
+
+  return {
+    "--tag-paper": tone.paper,
+    "--tag-border": tone.border,
+    "--tag-ink": tone.ink,
+    "--tag-tilt": tasteTagTilts[index] ?? "0deg"
+  } as CSSProperties;
+}
+
 export function RecipeCatalog({
   recipes,
   selectedMood,
@@ -414,8 +445,12 @@ export function RecipeCatalog({
                     </span>
 
                     <span className="recipe-catalog-card__tags" aria-label="口味标签">
-                      {tasteTags.map((tag) => (
-                        <span key={tag} className="recipe-catalog-card__taste-tag">
+                      {tasteTags.map((tag, index) => (
+                        <span
+                          key={tag}
+                          className="recipe-catalog-card__taste-tag"
+                          style={getTasteTagStyle(tag, index)}
+                        >
                           {tag}
                         </span>
                       ))}
