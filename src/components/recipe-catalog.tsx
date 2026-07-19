@@ -1,11 +1,17 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { useGSAP } from "@gsap/react";
+import { gsap } from "gsap";
+import { Flip } from "gsap/Flip";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useReducedMotion } from "motion/react";
 import type { RecipeCard, RecipeTag } from "@/lib/recipes";
+
+gsap.registerPlugin(useGSAP, ScrollTrigger, Flip);
 
 type RecipeCatalogProps = {
   recipes: RecipeCard[];
@@ -330,12 +336,27 @@ function getTasteTagStyle(label: string, index: number) {
   } as CSSProperties;
 }
 
+function updateCardSpotlight(event: ReactPointerEvent<HTMLElement>) {
+  const card = event.currentTarget;
+  const bounds = card.getBoundingClientRect();
+
+  card.style.setProperty("--spotlight-x", `${event.clientX - bounds.left}px`);
+  card.style.setProperty("--spotlight-y", `${event.clientY - bounds.top}px`);
+}
+
+function resetCardSpotlight(event: ReactPointerEvent<HTMLElement>) {
+  event.currentTarget.style.removeProperty("--spotlight-x");
+  event.currentTarget.style.removeProperty("--spotlight-y");
+}
+
 export function RecipeCatalog({
   recipes,
   selectedMood,
   selectedSpirit
 }: RecipeCatalogProps) {
   const prefersReducedMotion = useReducedMotion();
+  const productsRef = useRef<HTMLElement | null>(null);
+  const pendingFilterState = useRef<ReturnType<typeof Flip.getState> | null>(null);
   const [isFilterRailCompact, setIsFilterRailCompact] = useState(false);
   const [isFilterRailHidden, setIsFilterRailHidden] = useState(false);
   const lastScrollY = useRef(0);
@@ -409,8 +430,129 @@ export function RecipeCatalog({
     [activeMood, activeSpirit, deferredSearchQuery, recipes]
   );
   const visibleRecipes = filteredRecipes.slice(0, visibleLimit);
+  const visibleRecipeKeys = visibleRecipes.map((recipe) => recipe.slug).join("|");
+  const visibleRecipeKeySet = new Set(visibleRecipes.map((recipe) => recipe.slug));
+
+  useGSAP(
+    () => {
+      const cards = gsap.utils.toArray<HTMLElement>(
+        ".recipe-catalog-card:not(.is-filtered-out)"
+      );
+
+      if (cards.length === 0) {
+        return;
+      }
+
+      if (prefersReducedMotion) {
+        gsap.set(cards, { clearProps: "all" });
+        return;
+      }
+
+      gsap.set(cards, {
+        autoAlpha: 0,
+        scale: 0.98,
+        transformOrigin: "50% 50%",
+        y: 28
+      });
+
+      ScrollTrigger.batch(cards, {
+        batchMax: 4,
+        interval: 0.08,
+        once: true,
+        start: "top 88%",
+        onEnter: (batch) => {
+          gsap.to(batch, {
+            autoAlpha: 1,
+            duration: 0.72,
+            ease: "power3.out",
+            overwrite: true,
+            scale: 1,
+            stagger: 0.12,
+            y: 0
+          });
+        }
+      });
+    },
+    {
+      dependencies: [prefersReducedMotion],
+      revertOnUpdate: true,
+      scope: productsRef
+    }
+  );
+
+  useGSAP(
+    () => {
+      const state = pendingFilterState.current;
+      pendingFilterState.current = null;
+
+      if (!state || prefersReducedMotion) {
+        return;
+      }
+
+      const visibleCards = gsap.utils.toArray<HTMLElement>(
+        ".recipe-catalog-card:not(.is-filtered-out)"
+      );
+
+      gsap.set(visibleCards, { autoAlpha: 1 });
+
+      Flip.from(state, {
+        duration: 0.68,
+        ease: "power2.inOut",
+        nested: true,
+        onEnter: (elements) =>
+          gsap.fromTo(
+            elements,
+            { autoAlpha: 0, scale: 0.86 },
+            {
+              autoAlpha: 1,
+              duration: 0.42,
+              ease: "power2.out",
+              overwrite: "auto",
+              scale: 1,
+              stagger: 0.035
+            }
+          ),
+        scale: true,
+        stagger: { each: 0.025, from: "edges" },
+        targets: visibleCards
+      });
+    },
+    {
+      dependencies: [visibleRecipeKeys, prefersReducedMotion],
+      revertOnUpdate: true,
+      scope: productsRef
+    }
+  );
+
+  const captureFilterState = () => {
+    if (prefersReducedMotion || !productsRef.current) {
+      pendingFilterState.current = null;
+      return;
+    }
+
+    const cards = gsap.utils.toArray<HTMLElement>(
+      ".recipe-catalog-card:not(.is-filtered-out)",
+      productsRef.current
+    );
+
+    if (cards.length === 0) {
+      pendingFilterState.current = null;
+      return;
+    }
+
+    Flip.killFlipsOf(cards);
+    gsap.set(cards, {
+      clearProps: "transform,position,width,height,top,left,gridArea,transition"
+    });
+    gsap.set(cards, { autoAlpha: 1 });
+    pendingFilterState.current = Flip.getState(cards);
+  };
 
   const updateFilters = (mood: MoodFilter, spirit: SpiritFilter) => {
+    if (mood !== activeMood || spirit !== activeSpirit) {
+      captureFilterState();
+    }
+
     setActiveMood(mood);
     setActiveSpirit(spirit);
     setVisibleLimit(pageSize);
@@ -421,10 +563,6 @@ export function RecipeCatalog({
     setSearchQuery("");
     setVisibleLimit(pageSize);
   };
-
-  const motionTransition = prefersReducedMotion
-    ? { duration: 0.01 }
-    : { duration: 0.32, ease: [0.22, 1, 0.36, 1] as const };
   const resultLabel =
     visibleRecipes.length < filteredRecipes.length
       ? `${visibleRecipes.length} / ${filteredRecipes.length}`
@@ -539,34 +677,39 @@ export function RecipeCatalog({
           </div>
         </section>
 
-        <section className="recipe-catalog-products" aria-live="polite" aria-label="配方目录">
-          <AnimatePresence initial={false} mode="popLayout">
-            {visibleRecipes.map((recipe) => {
+        <section
+          ref={productsRef}
+          className="recipe-catalog-products"
+          aria-live="polite"
+          aria-label="配方目录"
+        >
+          {recipes.map((recipe) => {
+              const isVisible = visibleRecipeKeySet.has(recipe.slug);
               const stage = getSpiritStage(recipe.baseSpirits[0]?.category ?? recipe.baseSpiritCategory);
               const baseSpiritSummary = getBaseSpiritSummary(recipe);
               const tasteTags = getDisplayTasteTags(recipe);
               const imageSource = recipe.imageUrl;
 
               return (
-                <motion.article
-                  layout
+                <article
                   key={recipe.slug}
-                  className="recipe-catalog-card"
+                  className={`recipe-catalog-card${isVisible ? "" : " is-filtered-out"}`}
                   style={
                     {
                       "--recipe-stage": stage.stage,
                       "--recipe-accent": stage.accent
                     } as CSSProperties
                   }
-                  initial={prefersReducedMotion ? false : { opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
-                  transition={motionTransition}
                 >
-                  <Link href={`/recipes/${recipe.slug}`} className="recipe-catalog-card__link">
+                  <Link
+                    href={`/recipes/${recipe.slug}`}
+                    className="recipe-catalog-card__link"
+                  >
                     <span
                       className="recipe-catalog-card__media"
                       aria-hidden={imageSource ? undefined : true}
+                      onPointerMove={updateCardSpotlight}
+                      onPointerLeave={resetCardSpotlight}
                     >
                       {imageSource ? (
                         <Image
@@ -606,10 +749,10 @@ export function RecipeCatalog({
                       ))}
                     </span>
                   </Link>
-                </motion.article>
+                </article>
               );
             })}
-          </AnimatePresence>
+
 
           {filteredRecipes.length === 0 ? (
             <div className="recipe-catalog-no-results">
