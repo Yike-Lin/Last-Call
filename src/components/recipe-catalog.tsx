@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties } from "react";
-import { useDeferredValue, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
@@ -336,6 +336,9 @@ export function RecipeCatalog({
   selectedSpirit
 }: RecipeCatalogProps) {
   const prefersReducedMotion = useReducedMotion();
+  const [isFilterRailCompact, setIsFilterRailCompact] = useState(false);
+  const [isFilterRailHidden, setIsFilterRailHidden] = useState(false);
+  const lastScrollY = useRef(0);
   const availableMoodFilters = useMemo(() => getAvailableMoodFilters(recipes), [recipes]);
   const normalizedMood = normalizeMood(selectedMood, availableMoodFilters);
   const normalizedSpirit = normalizeSpirit(selectedSpirit);
@@ -344,6 +347,54 @@ export function RecipeCatalog({
   const [searchQuery, setSearchQuery] = useState("");
   const [visibleLimit, setVisibleLimit] = useState(pageSize);
   const deferredSearchQuery = useDeferredValue(searchQuery.trim().toLocaleLowerCase());
+
+  useEffect(() => {
+    let animationFrame = 0;
+
+    const syncFilterRail = () => {
+      const currentScrollY = window.scrollY;
+      const scrollDelta = currentScrollY - lastScrollY.current;
+
+      if (currentScrollY <= 24) {
+        setIsFilterRailCompact(false);
+        setIsFilterRailHidden(false);
+      } else if (currentScrollY > 48) {
+        setIsFilterRailCompact(true);
+
+        if (Math.abs(scrollDelta) >= 2) {
+          if (scrollDelta > 0 && currentScrollY > 180) {
+            setIsFilterRailHidden(true);
+          }
+
+          if (scrollDelta < 0) {
+            setIsFilterRailHidden(false);
+          }
+        }
+      }
+
+      lastScrollY.current = currentScrollY;
+      animationFrame = 0;
+    };
+
+    const handleScroll = () => {
+      if (animationFrame !== 0) {
+        return;
+      }
+
+      animationFrame = window.requestAnimationFrame(syncFilterRail);
+    };
+
+    lastScrollY.current = window.scrollY;
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+
+      if (animationFrame !== 0) {
+        window.cancelAnimationFrame(animationFrame);
+      }
+    };
+  }, []);
 
   const filteredRecipes = useMemo(
     () =>
@@ -378,6 +429,13 @@ export function RecipeCatalog({
     visibleRecipes.length < filteredRecipes.length
       ? `${visibleRecipes.length} / ${filteredRecipes.length}`
       : `${filteredRecipes.length}`;
+  const filterRailClassName = [
+    "recipe-catalog-filter-rail",
+    isFilterRailCompact ? "recipe-catalog-filter-rail--compact" : "",
+    isFilterRailHidden ? "recipe-catalog-filter-rail--hidden" : ""
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <main className="recipe-catalog-page">
@@ -387,8 +445,45 @@ export function RecipeCatalog({
           <p>今晚，想喝哪一杯？</p>
         </section>
 
-        <section className="recipe-catalog-filter-rail" aria-label="筛选配方">
-          <div className="recipe-catalog-filter-row">
+        <section className={filterRailClassName} aria-label="筛选配方">
+          <div className="recipe-catalog-filter-summary">
+            <button
+              className="recipe-catalog-filter-summary__toggle"
+              type="button"
+              aria-expanded={!isFilterRailCompact}
+              aria-label="展开筛选"
+              onClick={() => {
+                setIsFilterRailCompact(false);
+                setIsFilterRailHidden(false);
+              }}
+            >
+              <span className="recipe-catalog-filter-summary__item">
+                <span>口味</span>
+                <strong>{activeMood}</strong>
+              </span>
+              <span className="recipe-catalog-filter-summary__item">
+                <span>基酒</span>
+                <strong>{activeSpirit}</strong>
+              </span>
+              <span className="recipe-catalog-filter-summary__action">筛选</span>
+            </button>
+
+            <label className="recipe-catalog-search recipe-catalog-search--compact">
+              <span className="recipe-catalog-visually-hidden">搜索配方</span>
+              <input
+                type="search"
+                value={searchQuery}
+                placeholder="搜索配方"
+                aria-label="搜索配方"
+                onChange={(event) => {
+                  setSearchQuery(event.target.value);
+                  setVisibleLimit(pageSize);
+                }}
+              />
+            </label>
+          </div>
+
+          <div className="recipe-catalog-filter-row recipe-catalog-filter-row--primary">
             <span className="recipe-catalog-filter-label">口味</span>
             <div className="recipe-catalog-filter-main">
               <div className="recipe-catalog-filter-options" role="group" aria-label="按口味筛选">
