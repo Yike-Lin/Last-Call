@@ -2482,7 +2482,6 @@ body:has(.recipe-detail-page) .site-header-shell {
   padding-bottom: 32px;
 }
 
-.recipe-detail-heading__eyebrow,
 .recipe-detail-console__signal,
 .recipe-detail-specimen__topline,
 .recipe-detail-stage__caption,
@@ -2493,11 +2492,6 @@ body:has(.recipe-detail-page) .site-header-shell {
   font-weight: 700;
   letter-spacing: 0.1em;
   line-height: 1;
-}
-
-.recipe-detail-heading__eyebrow {
-  margin: 0 0 15px;
-  color: var(--detail-vermouth);
 }
 
 .recipe-detail-heading h1 {
@@ -2557,8 +2551,9 @@ body:has(.recipe-detail-page) .site-header-shell {
 .recipe-detail-stage {
   position: relative;
   isolation: isolate;
-  aspect-ratio: 1.22;
-  margin-top: 12px;
+  width: min(70%, 430px);
+  aspect-ratio: 1168 / 912;
+  margin: 0 auto;
   overflow: hidden;
   background: var(--detail-surface-raised);
 }
@@ -2997,6 +2992,11 @@ body:has(.recipe-detail-page) .site-header-shell {
 
   .recipe-detail-specimen {
     position: static;
+  }
+
+  .recipe-detail-stage {
+    width: 100%;
+    max-width: none;
   }
 }
 
