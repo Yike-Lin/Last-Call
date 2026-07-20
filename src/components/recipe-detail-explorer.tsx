@@ -187,19 +187,21 @@ export function RecipeDetailExplorer({ recipe }: RecipeDetailExplorerProps) {
       <div className="recipe-detail-shell">
         <header className="recipe-detail-heading">
           <div>
-            <p className="recipe-detail-heading__eyebrow">RECIPE INSTRUMENT / {recipe.method}</p>
-            <h1>{recipe.name}</h1>
+            <h1
+              style={
+                recipe.name.length >= 12
+                  ? { fontSize: "4.1rem", lineHeight: 1 }
+                  : undefined
+              }
+            >
+              {recipe.name}
+            </h1>
           </div>
           <p>{recipe.summary}</p>
         </header>
 
         <section className="recipe-detail-explorer" aria-label={`${recipe.name} 配方探索`}>
           <div className="recipe-detail-specimen">
-            <div className="recipe-detail-specimen__topline">
-              <span>COCKTAIL SPECIMEN</span>
-              <span>{recipe.glassware}</span>
-            </div>
-
             <div className="recipe-detail-stage">
               {recipe.imageUrl ? (
                 <Image
@@ -207,7 +209,7 @@ export function RecipeDetailExplorer({ recipe }: RecipeDetailExplorerProps) {
                   alt={recipe.imageAlt ?? recipe.name}
                   fill
                   priority
-                  sizes="(max-width: 1023px) 100vw, 56vw"
+                  sizes="(max-width: 1023px) 100vw, 430px"
                   unoptimized={isLocalRecipeImage(recipe.imageUrl)}
                   className="recipe-detail-stage__image"
                 />
@@ -250,12 +252,6 @@ export function RecipeDetailExplorer({ recipe }: RecipeDetailExplorerProps) {
                   </div>
                 </>
               ) : null}
-            </div>
-
-            <div className="recipe-detail-specimen__footnotes">
-              <span>{recipe.iceStyle ?? "按配方加冰"}</span>
-              <span>{recipe.garnish ?? "按配方装饰"}</span>
-              <span>{recipe.servings} 杯</span>
             </div>
           </div>
 
