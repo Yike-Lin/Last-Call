@@ -21,13 +21,29 @@ export type RecipeCard = {
   method: string;
   difficulty: string;
   estimatedAbv: string;
+  garnish: string | null;
+  iceStyle: string | null;
+  prepTimeSeconds: number | null;
+  servings: number;
   imageUrl: string | null;
   imageAlt: string | null;
   ingredients: Array<{
+    slug: string;
     name: string;
     amount: string;
+    role: string;
+    preparationNote: string | null;
+    isOptional: boolean;
   }>;
   steps: string[];
+  detailedSteps: RecipeStep[];
+};
+
+export type RecipeStep = {
+  stepNumber: number;
+  actionType: string | null;
+  instruction: string;
+  durationSeconds: number | null;
 };
 
 export type RecipeBaseSpirit = {
@@ -54,6 +70,10 @@ const recipeSelect = `
   difficulty,
   primary_method,
   estimated_abv,
+  garnish_text,
+  ice_style,
+  prep_time_seconds,
+  servings,
   balance_sweet,
   balance_sour,
   balance_bitter,
@@ -73,7 +93,9 @@ const recipeSelect = `
     display_amount,
     normalized_ml,
     unit_code,
+    preparation_note,
     sort_order,
+    is_optional,
     ingredient:ingredients!recipe_ingredients_ingredient_id_fkey (
       slug,
       name_en,
@@ -83,8 +105,10 @@ const recipeSelect = `
   ),
   recipe_steps (
     step_number,
+    action_type,
     instruction_en,
-    instruction_zh
+    instruction_zh,
+    duration_seconds
   ),
   recipe_tags (
     tags (
@@ -302,19 +326,28 @@ function mapRecipe(row: PublishedRecipeRow): RecipeCard {
   const ingredients = [...row.recipe_ingredients]
     .sort((a, b) => a.sort_order - b.sort_order)
     .map((item) => ({
+      slug: item.ingredient.slug,
       name: localizedValue(item.ingredient.name_zh, item.ingredient.name_en),
       amount: formatAmount(
         item.display_amount,
         item.amount_value,
         item.unit_code
-      )
+      ),
+      role: item.role,
+      preparationNote: item.preparation_note?.trim() || null,
+      isOptional: item.is_optional
     }));
 
-  const steps = [...row.recipe_steps]
+  const detailedSteps = [...row.recipe_steps]
     .sort((a, b) => a.step_number - b.step_number)
-    .map((step) =>
-      localizedValue(step.instruction_zh, step.instruction_en)
-    );
+    .map((step) => ({
+      stepNumber: step.step_number,
+      actionType: step.action_type,
+      instruction: localizedValue(step.instruction_zh, step.instruction_en),
+      durationSeconds: step.duration_seconds
+    }));
+
+  const steps = detailedSteps.map((step) => step.instruction);
 
   const tags = row.recipe_tags.map(({ tags }) => ({
     slug: tags.slug,
@@ -349,10 +382,15 @@ function mapRecipe(row: PublishedRecipeRow): RecipeCard {
     difficulty: difficultyLabels[row.difficulty] ?? "待评估",
     estimatedAbv:
       row.estimated_abv === null ? "待测算" : `约 ${row.estimated_abv}%`,
+    garnish: row.garnish_text?.trim() || null,
+    iceStyle: row.ice_style?.trim() || null,
+    prepTimeSeconds: row.prep_time_seconds,
+    servings: Number(row.servings),
     imageUrl: getRecipeImageUrl(primaryAsset?.storage_path ?? null),
     imageAlt: primaryAsset?.alt_text ?? null,
     ingredients,
-    steps
+    steps,
+    detailedSteps
   };
 }
 
