@@ -782,7 +782,9 @@ from (
     ('margarita', 'margarita/card.png', '玛格丽特鸡尾酒，碟形香槟杯盛装，青柠色酒液与盐边。', 1168, 912),
     ('mojito', 'mojito/card.png', '莫吉托鸡尾酒，海波杯盛装，碎冰、薄荷、青柠与气泡。', 1168, 912),
     ('moscow-mule', 'moscow-mule/card.png', '莫斯科骡子鸡尾酒，骡子杯盛装，姜汁啤酒与青柠。', 1168, 912),
-    ('aviation', 'aviation/card.png', '飞行鸡尾酒，冰镇鸡尾酒杯盛装，淡紫色酒液与花香。', 1168, 912)
+    ('aviation', 'aviation/card.png', '飞行鸡尾酒，冰镇鸡尾酒杯盛装，淡紫色酒液与花香。', 1168, 912),
+    ('french-75', 'french-75/card.png', '法国 75 鸡尾酒，香槟笛形杯盛装，金色气泡酒液与柠檬装饰。', 1168, 912),
+    ('boulevardier', 'boulevardier/card.png', '林荫大道鸡尾酒，冰镇鸡尾酒杯盛装，琥珀红色酒液与橙皮装饰。', 1168, 912)
 ) as v(recipe_slug, storage_path, alt_text, width, height)
 join public.recipes r on r.slug = v.recipe_slug
 on conflict (storage_path) do update
