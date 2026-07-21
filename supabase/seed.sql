@@ -72,7 +72,7 @@ values
   (
     'negroni',
     'Negroni',
-    '内格罗尼',
+    '尼格罗尼',
     '{}',
     'An equal-parts classic built around gin, red bitter liqueur, and sweet vermouth.',
     '三种酒等量组合。苦味先到，甜味与草本香气随后展开。',
@@ -382,7 +382,7 @@ with asset_rows (
   height
 ) as (
   values
-    ('negroni', 'negroni/card.png', '内格罗尼鸡尾酒，短杯盛装，红色酒液与橙皮装饰。', 1168, 912),
+    ('negroni', 'negroni/card.png', '尼格罗尼鸡尾酒，短杯盛装，红色酒液与橙皮装饰。', 1168, 912),
     ('margarita', 'margarita/card.png', '玛格丽特鸡尾酒，碟形香槟杯盛装，浅青柠黄色酒液、半圈盐边与青柠装饰。', 1168, 912),
     ('mojito', 'mojito/card.png', '莫吉托鸡尾酒，海波杯盛装，碎冰、薄荷、青柠与清透气泡。', 1168, 912),
     ('old-fashioned', 'old-fashioned/card.png', '古典鸡尾酒，厚底古典杯盛装，琥珀色酒液、大冰块与橙皮装饰。', 1168, 912)
@@ -490,16 +490,16 @@ insert into public.recipes (
   published_at
 )
 values
-  ('daiquiri', 'Daiquiri', '代基里', '{}', 'A precise rum sour with fresh lime and superfine sugar.', '朗姆酒、青柠与细砂糖组成的经典酸酒，明亮、直接而利落。', 'the_unforgettables', (select id from public.ingredients where slug = 'white-rum'), 1, (select id from public.glassware where slug = 'coupe'), 'N/A', 'Serve up', 'shake', 240, 1, 3, 4, 0, 3, 20.00, 'published', now()),
+  ('daiquiri', 'Daiquiri', '得其利', '{}', 'A precise rum sour with fresh lime and superfine sugar.', '朗姆酒、青柠与细砂糖组成的经典酸酒，明亮、直接而利落。', 'the_unforgettables', (select id from public.ingredients where slug = 'white-rum'), 1, (select id from public.glassware where slug = 'coupe'), 'N/A', 'Serve up', 'shake', 240, 1, 3, 4, 0, 3, 20.00, 'published', now()),
   ('dry-martini', 'Dry Martini', '干马天尼', '{}', 'Gin and dry vermouth, stirred cold and served with a clean, aromatic finish.', '金酒与干味美思的冷冽组合，干净、克制，尾韵带着柠檬皮或橄榄的香气。', 'the_unforgettables', (select id from public.ingredients where slug = 'gin'), 2, (select id from public.glassware where slug = 'martini-glass'), '挤压柠檬皮释放油脂，或按需用青橄榄装饰。', 'Ice cubes, serve up', 'stir', 180, 1, 0, 0, 1, 5, 26.00, 'published', now()),
   ('manhattan', 'Manhattan', '曼哈顿', '{}', 'Rye whiskey, sweet vermouth, and bitters in a deep, spirit-forward classic.', '黑麦威士忌、甜味美思与苦精构成的深色经典，辛香、醇厚而适合慢饮。', 'the_unforgettables', (select id from public.ingredients where slug = 'rye-whiskey'), 2, (select id from public.glassware where slug = 'coupe'), '鸡尾酒樱桃。', 'Ice cubes, serve up', 'stir', 180, 1, 3, 0, 2, 4, 27.00, 'published', now()),
   ('whiskey-sour', 'Whiskey Sour', '威士忌酸', '{}', 'Bourbon, lemon, and sugar sharpened with an optional egg-white texture.', '波本威士忌、柠檬与糖浆组成的酸酒，可用蛋清增加柔滑泡沫。', 'the_unforgettables', (select id from public.ingredients where slug = 'bourbon'), 2, (select id from public.glassware where slug = 'old-fashioned'), '半片橙子与马拉斯奇诺樱桃，可选橙皮。', 'Serve up or over a large ice cube', 'shake', 300, 1, 3, 4, 1, 3, 20.00, 'published', now()),
-  ('sidecar', 'Sidecar', '侧车', '{}', 'Cognac, orange liqueur, and lemon in a bright, dry-leaning sour.', '干邑、橙味利口酒与柠檬汁组成的明亮酸酒，酸度清晰，酒体紧致。', 'the_unforgettables', (select id from public.ingredients where slug = 'cognac'), 2, (select id from public.glassware where slug = 'coupe'), 'N/A', 'Serve up', 'shake', 240, 1, 3, 4, 0, 3, 24.00, 'published', now()),
+  ('sidecar', 'Sidecar', '边车', '{}', 'Cognac, orange liqueur, and lemon in a bright, dry-leaning sour.', '干邑、橙味利口酒与柠檬汁组成的明亮酸酒，酸度清晰，酒体紧致。', 'the_unforgettables', (select id from public.ingredients where slug = 'cognac'), 2, (select id from public.glassware where slug = 'coupe'), 'N/A', 'Serve up', 'shake', 240, 1, 3, 4, 0, 3, 24.00, 'published', now()),
   ('aviation', 'Aviation', '飞行', '{}', 'Gin, maraschino, lemon, and violet create a floral, pale cocktail.', '金酒、马拉斯奇诺、柠檬与紫罗兰利口酒组成的花香型短饮。', 'the_unforgettables', (select id from public.ingredients where slug = 'gin'), 3, (select id from public.glassware where slug = 'coupe'), '可选马拉斯奇诺樱桃。', 'Serve up', 'shake', 240, 1, 2, 3, 1, 3, 22.00, 'published', now()),
-  ('clover-club', 'Clover Club', '克洛弗俱乐部', '{}', 'A gin sour with raspberry and egg white for a soft, berry-led finish.', '金酒、覆盆子与蛋清构成的柔和酸酒，果香明显，口感细腻。', 'the_unforgettables', (select id from public.ingredients where slug = 'gin'), 3, (select id from public.glassware where slug = 'coupe'), '新鲜覆盆子。', 'Serve up', 'shake', 300, 1, 3, 3, 0, 3, 20.00, 'published', now()),
+  ('clover-club', 'Clover Club', '三叶草俱乐部', '{}', 'A gin sour with raspberry and egg white for a soft, berry-led finish.', '金酒、覆盆子与蛋清构成的柔和酸酒，果香明显，口感细腻。', 'the_unforgettables', (select id from public.ingredients where slug = 'gin'), 3, (select id from public.glassware where slug = 'coupe'), '新鲜覆盆子。', 'Serve up', 'shake', 300, 1, 3, 3, 0, 3, 20.00, 'published', now()),
   ('moscow-mule', 'Moscow Mule', '莫斯科骡子', '{}', 'Vodka, ginger beer, and lime built long over a bright, spicy finish.', '伏特加、姜汁啤酒与青柠组成的长饮，气泡明亮，辛香清爽。', 'contemporary_classics', (select id from public.ingredients where slug = 'vodka'), 1, (select id from public.glassware where slug = 'mule-cup'), '青柠片。', 'Build over ice', 'build', 180, 1, 3, 2, 0, 2, 10.00, 'published', now()),
-  ('french-75', 'French 75', '法国 75', '{}', 'Gin, lemon, sugar, and Champagne lifted into a bright sparkling classic.', '金酒、柠檬、糖浆与香槟组成的轻盈气泡型经典。', 'contemporary_classics', (select id from public.ingredients where slug = 'gin'), 2, (select id from public.glassware where slug = 'champagne-flute'), 'N/A', 'Serve up', 'shake', 240, 1, 2, 2, 0, 2, 12.00, 'published', now()),
-  ('boulevardier', 'Boulevardier', '林荫大道', '{}', 'Bourbon or rye, Campari, and sweet vermouth in a bitter, spirit-forward classic.', '波本或黑麦威士忌、金巴利与甜味美思组成的苦味型经典，适合慢慢啜饮。', 'the_unforgettables', (select id from public.ingredients where slug = 'bourbon'), 2, (select id from public.glassware where slug = 'coupe'), '橙皮，可选柠檬皮。', 'Ice cubes, serve up', 'stir', 180, 1, 3, 0, 4, 4, 25.00, 'published', now())
+  ('french-75', 'French 75', '法国75', '{}', 'Gin, lemon, sugar, and Champagne lifted into a bright sparkling classic.', '金酒、柠檬、糖浆与香槟组成的轻盈气泡型经典。', 'contemporary_classics', (select id from public.ingredients where slug = 'gin'), 2, (select id from public.glassware where slug = 'champagne-flute'), 'N/A', 'Serve up', 'shake', 240, 1, 2, 2, 0, 2, 12.00, 'published', now()),
+  ('boulevardier', 'Boulevardier', '花花公子', '{}', 'Bourbon or rye, Campari, and sweet vermouth in a bitter, spirit-forward classic.', '波本或黑麦威士忌、金巴利与甜味美思组成的苦味型经典，适合慢慢啜饮。', 'the_unforgettables', (select id from public.ingredients where slug = 'bourbon'), 2, (select id from public.glassware where slug = 'coupe'), '橙皮，可选柠檬皮。', 'Ice cubes, serve up', 'stir', 180, 1, 3, 0, 4, 4, 25.00, 'published', now())
 on conflict (slug) do update
 set
   name_en = excluded.name_en,
@@ -771,20 +771,20 @@ select
   0
 from (
   values
-    ('daiquiri', 'daiquiri/card.png', '代基里鸡尾酒，冰镇鸡尾酒杯盛装，朗姆酒与青柠组成的明亮酸酒。', 1168, 912),
-    ('sidecar', 'sidecar/card.png', '侧车鸡尾酒，冰镇鸡尾酒杯盛装，干邑、橙味利口酒与柠檬组成的酸酒。', 1168, 912),
-    ('clover-club', 'clover-club/card.png', '克洛弗俱乐部鸡尾酒，粉红色酒液与覆盆子装饰。', 1168, 912),
+    ('daiquiri', 'daiquiri/card.png', '得其利鸡尾酒，冰镇鸡尾酒杯盛装，朗姆酒与青柠组成的明亮酸酒。', 1168, 912),
+    ('sidecar', 'sidecar/card.png', '边车鸡尾酒，冰镇鸡尾酒杯盛装，干邑、橙味利口酒与柠檬组成的酸酒。', 1168, 912),
+    ('clover-club', 'clover-club/card.png', '三叶草俱乐部鸡尾酒，粉红色酒液与覆盆子装饰。', 1168, 912),
     ('old-fashioned', 'old-fashioned/card.png', '古典鸡尾酒，古典杯盛装，琥珀色酒液与大冰块。', 1168, 912),
     ('whiskey-sour', 'whiskey-sour/card.png', '威士忌酸鸡尾酒，古典杯盛装，威士忌酸酒与橙子装饰。', 1168, 912),
-    ('negroni', 'negroni/card.png', '内格罗尼鸡尾酒，古典杯盛装，红色酒液与橙皮装饰。', 1168, 912),
+    ('negroni', 'negroni/card.png', '尼格罗尼鸡尾酒，古典杯盛装，红色酒液与橙皮装饰。', 1168, 912),
     ('dry-martini', 'dry-martini/card.png', '干马天尼鸡尾酒，马天尼杯盛装，清澈酒液与柠檬皮装饰。', 1168, 912),
     ('manhattan', 'manhattan/card.png', '曼哈顿鸡尾酒，鸡尾酒杯盛装，深色酒液与樱桃装饰。', 1168, 912),
     ('margarita', 'margarita/card.png', '玛格丽特鸡尾酒，碟形香槟杯盛装，青柠色酒液与盐边。', 1168, 912),
     ('mojito', 'mojito/card.png', '莫吉托鸡尾酒，海波杯盛装，碎冰、薄荷、青柠与气泡。', 1168, 912),
     ('moscow-mule', 'moscow-mule/card.png', '莫斯科骡子鸡尾酒，骡子杯盛装，姜汁啤酒与青柠。', 1168, 912),
     ('aviation', 'aviation/card.png', '飞行鸡尾酒，冰镇鸡尾酒杯盛装，淡紫色酒液与花香。', 1168, 912),
-    ('french-75', 'french-75/card.png', '法国 75 鸡尾酒，香槟笛形杯盛装，金色气泡酒液与柠檬装饰。', 1168, 912),
-    ('boulevardier', 'boulevardier/card.png', '林荫大道鸡尾酒，冰镇鸡尾酒杯盛装，琥珀红色酒液与橙皮装饰。', 1168, 912)
+    ('french-75', 'french-75/card.png', '法国75鸡尾酒，香槟笛形杯盛装，金色气泡酒液与柠檬装饰。', 1168, 912),
+    ('boulevardier', 'boulevardier/card.png', '花花公子鸡尾酒，冰镇鸡尾酒杯盛装，琥珀红色酒液与橙皮装饰。', 1168, 912)
 ) as v(recipe_slug, storage_path, alt_text, width, height)
 join public.recipes r on r.slug = v.recipe_slug
 on conflict (storage_path) do update
@@ -796,3 +796,9 @@ set
   is_primary = excluded.is_primary,
   sort_order = excluded.sort_order,
   updated_at = now();
+
+-- Keep the second IBA batch available when the local database is reseeded.
+\ir migrations/202607210002_iba_recipe_batch_two.sql
+
+-- Keep the third IBA batch available when the local database is reseeded.
+\ir migrations/202607210004_iba_recipe_batch_three.sql
