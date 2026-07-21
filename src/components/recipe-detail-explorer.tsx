@@ -1,110 +1,106 @@
 "use client";
 
-import type { CSSProperties } from "react";
-import { useState } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { RecipeCard } from "@/lib/recipes";
+import { useRecipeTransition } from "@/components/recipe-transition-provider";
 
-type RecipeAnnotation = {
-  id: string;
-  order: string;
-  label: string;
-  eyebrow: string;
-  title: string;
-  description: string;
+type IngredientAnchor = {
+  ingredientSlug: string;
   x: number;
   y: number;
-  ingredientSlugs?: string[];
-  stepActions?: string[];
-  detail?: string;
+  label: string;
 };
 
-const recipeAnnotations: Record<string, RecipeAnnotation[]> = {
+type IngredientConnection = {
+  width: number;
+  height: number;
+  path: string;
+  endX: number;
+  endY: number;
+};
+
+const recipeIngredientAnchors: Record<string, IngredientAnchor[]> = {
+  aviation: [
+    { ingredientSlug: "gin", x: 50, y: 45, label: "酒液主体" },
+    { ingredientSlug: "maraschino", x: 53, y: 40, label: "酒液主体" },
+    { ingredientSlug: "lemon-juice", x: 61, y: 24, label: "杯口柑橘" },
+    { ingredientSlug: "creme-de-violette", x: 47, y: 43, label: "淡紫酒液" }
+  ],
+  "clover-club": [
+    { ingredientSlug: "gin", x: 50, y: 46, label: "粉红酒液" },
+    { ingredientSlug: "raspberry-syrup", x: 51, y: 24, label: "覆盆子装饰" },
+    { ingredientSlug: "lemon-juice", x: 43, y: 40, label: "粉红酒液" },
+    { ingredientSlug: "egg-white", x: 50, y: 33, label: "泡沫层" }
+  ],
+  daiquiri: [
+    { ingredientSlug: "white-rum", x: 50, y: 39, label: "澄澈酒液" },
+    { ingredientSlug: "lime-juice", x: 65, y: 23, label: "青柠皮" },
+    { ingredientSlug: "superfine-sugar", x: 46, y: 40, label: "澄澈酒液" }
+  ],
+  sidecar: [
+    { ingredientSlug: "cognac", x: 50, y: 37, label: "琥珀酒液" },
+    { ingredientSlug: "triple-sec", x: 66, y: 23, label: "橙皮香气" },
+    { ingredientSlug: "lemon-juice", x: 46, y: 37, label: "琥珀酒液" }
+  ],
+  "old-fashioned": [
+    { ingredientSlug: "bourbon", x: 50, y: 59, label: "琥珀酒液" },
+    { ingredientSlug: "simple-syrup", x: 46, y: 62, label: "琥珀酒液" },
+    { ingredientSlug: "angostura-bitters", x: 54, y: 55, label: "冰块与酒液" }
+  ],
+  "whiskey-sour": [
+    { ingredientSlug: "bourbon", x: 50, y: 59, label: "金色酒液" },
+    { ingredientSlug: "lemon-juice", x: 48, y: 55, label: "金色酒液" },
+    { ingredientSlug: "simple-syrup", x: 44, y: 61, label: "金色酒液" },
+    { ingredientSlug: "egg-white", x: 49, y: 39, label: "泡沫层" }
+  ],
+  negroni: [
+    { ingredientSlug: "gin", x: 50, y: 58, label: "红色酒液" },
+    { ingredientSlug: "campari", x: 54, y: 57, label: "红色酒液" },
+    { ingredientSlug: "sweet-vermouth", x: 46, y: 57, label: "红色酒液" }
+  ],
+  "dry-martini": [
+    { ingredientSlug: "gin", x: 49, y: 38, label: "澄澈酒液" },
+    { ingredientSlug: "dry-vermouth", x: 45, y: 40, label: "澄澈酒液" }
+  ],
+  manhattan: [
+    { ingredientSlug: "rye-whiskey", x: 50, y: 35, label: "深色酒液" },
+    { ingredientSlug: "sweet-vermouth", x: 47, y: 36, label: "深色酒液" },
+    { ingredientSlug: "angostura-bitters", x: 54, y: 39, label: "深色酒液" }
+  ],
+  margarita: [
+    { ingredientSlug: "tequila-blanco", x: 50, y: 42, label: "青柠色酒液" },
+    { ingredientSlug: "triple-sec", x: 46, y: 40, label: "青柠色酒液" },
+    { ingredientSlug: "lime-juice", x: 66, y: 22, label: "青柠片" }
+  ],
   mojito: [
-    {
-      id: "mint-aroma",
-      order: "01",
-      label: "薄荷香气",
-      eyebrow: "AROMA LAYER",
-      title: "从杯口先抵达的薄荷",
-      description: "薄荷不需要被捣碎。轻压，让青草和清凉感留在第一口，而不是变成杂味。",
-      x: 40,
-      y: 20,
-      ingredientSlugs: ["mint"],
-      stepActions: ["muddle", "garnish"],
-      detail: "8 片叶，轻压后再以新鲜薄荷收尾"
-    },
-    {
-      id: "lime-acidity",
-      order: "02",
-      label: "青柠酸度",
-      eyebrow: "BRIGHTNESS",
-      title: "酸度把整杯拉亮",
-      description: "现榨青柠提供清晰的骨架，让糖浆只负责圆润，而不把这杯酒推向甜腻。",
-      x: 29,
-      y: 49,
-      ingredientSlugs: ["lime-juice", "simple-syrup"],
-      stepActions: ["muddle"],
-      detail: "20 ml 鲜榨青柠汁，配 15 ml 糖浆"
-    },
-    {
-      id: "rum-spine",
-      order: "03",
-      label: "朗姆骨架",
-      eyebrow: "SPIRIT CORE",
-      title: "轻盈，但不失去酒体",
-      description: "白朗姆是这杯的中轴。它保持干净的甘蔗底色，也把酸、甜、气泡连接成完整的酒体。",
-      x: 47,
-      y: 53,
-      ingredientSlugs: ["white-rum"],
-      stepActions: ["build"],
-      detail: "45 ml 白朗姆，维持清爽的 11% ABV"
-    },
-    {
-      id: "crushed-ice",
-      order: "04",
-      label: "碎冰温度",
-      eyebrow: "TEXTURE",
-      title: "碎冰负责稀释，也负责节奏",
-      description: "填满的碎冰让温度迅速下降，入口从容变轻，整杯会在饮用过程中缓慢打开。",
-      x: 57,
-      y: 68,
-      stepActions: ["build"],
-      detail: "碎冰填满海波杯"
-    },
-    {
-      id: "sparkling-finish",
-      order: "05",
-      label: "气泡收尾",
-      eyebrow: "FINISH",
-      title: "最后一层，是会消失的气泡",
-      description: "苏打水最后加入，轻轻提拉而不是搅散。它把薄荷香和青柠酸带到更轻、更长的尾韵。",
-      x: 68,
-      y: 35,
-      ingredientSlugs: ["soda-water"],
-      stepActions: ["top"],
-      detail: "加满苏打水，轻提混合"
-    }
+    { ingredientSlug: "mint", x: 47, y: 21, label: "薄荷装饰" },
+    { ingredientSlug: "lime-juice", x: 57, y: 39, label: "青柠与碎冰" },
+    { ingredientSlug: "simple-syrup", x: 48, y: 53, label: "清爽酒液" },
+    { ingredientSlug: "white-rum", x: 50, y: 52, label: "清爽酒液" },
+    { ingredientSlug: "soda-water", x: 51, y: 33, label: "气泡层" }
+  ],
+  "moscow-mule": [
+    { ingredientSlug: "vodka", x: 51, y: 48, label: "铜杯酒液" },
+    { ingredientSlug: "ginger-beer", x: 48, y: 35, label: "冰块与气泡" },
+    { ingredientSlug: "lime-juice", x: 69, y: 22, label: "青柠片" }
+  ],
+  "french-75": [
+    { ingredientSlug: "gin", x: 50, y: 45, label: "金色酒液" },
+    { ingredientSlug: "lemon-juice", x: 42, y: 16, label: "柠檬片" },
+    { ingredientSlug: "simple-syrup", x: 48, y: 48, label: "金色酒液" },
+    { ingredientSlug: "champagne", x: 50, y: 39, label: "气泡酒液" }
+  ],
+  boulevardier: [
+    { ingredientSlug: "bourbon", x: 50, y: 60, label: "琥珀酒液" },
+    { ingredientSlug: "campari", x: 54, y: 61, label: "琥珀酒液" },
+    { ingredientSlug: "sweet-vermouth", x: 46, y: 61, label: "琥珀酒液" }
   ]
 };
 
-function getFallbackAnnotation(recipe: RecipeCard): RecipeAnnotation {
-  return {
-    id: "recipe-note",
-    order: "",
-    label: "配方说明",
-    eyebrow: "RECIPE NOTE",
-    title: "这杯酒的结构",
-    description: recipe.summary,
-    x: 0,
-    y: 0,
-    ingredientSlugs: recipe.ingredients.slice(0, 2).map((ingredient) => ingredient.slug),
-    stepActions: recipe.detailedSteps
-      .slice(0, 1)
-      .flatMap((step) => (step.actionType ? [step.actionType] : [])),
-    detail: `${recipe.method} · ${recipe.glassware}`
-  };
+function getIngredientAnchors(recipe: RecipeCard) {
+  return recipeIngredientAnchors[recipe.slug] ?? [];
 }
 
 function getRoleLabel(role: string) {
@@ -147,19 +143,6 @@ function formatDuration(seconds: number | null) {
   return remainingSeconds ? `${minutes} 分 ${remainingSeconds} 秒` : `${minutes} 分`;
 }
 
-function formatTotalDuration(seconds: number | null) {
-  if (seconds === null) {
-    return "按步骤完成";
-  }
-
-  const minutes = Math.max(1, Math.round(seconds / 60));
-  return `${String(minutes).padStart(2, "0")} 分钟`;
-}
-
-function isRelated(target: string | null, relatedTargets: string[] | undefined) {
-  return Boolean(target && relatedTargets?.includes(target));
-}
-
 function isLocalRecipeImage(imageUrl: string) {
   return (
     imageUrl.startsWith("http://127.0.0.1") ||
@@ -172,44 +155,104 @@ type RecipeDetailExplorerProps = {
 };
 
 export function RecipeDetailExplorer({ recipe }: RecipeDetailExplorerProps) {
-  const annotations = recipeAnnotations[recipe.slug] ?? [];
-  const fallbackAnnotation = getFallbackAnnotation(recipe);
-  const [selectedId, setSelectedId] = useState(annotations[0]?.id ?? fallbackAnnotation.id);
-  const selectedAnnotation =
-    annotations.find((annotation) => annotation.id === selectedId) ?? fallbackAnnotation;
-  const hasImageAnnotations = annotations.length > 0;
+  const { isTransitioningTo } = useRecipeTransition();
+  const workspaceRef = useRef<HTMLElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const ingredientElements = useRef(new Map<string, HTMLLIElement>());
+  const [activeIngredientSlug, setActiveIngredientSlug] = useState<string | null>(null);
+  const [connection, setConnection] = useState<IngredientConnection | null>(null);
+  const ingredientAnchors = useMemo(() => getIngredientAnchors(recipe), [recipe]);
+  const activeAnchor = ingredientAnchors.find(
+    (anchor) => anchor.ingredientSlug === activeIngredientSlug
+  );
+  const isTransitioning = isTransitioningTo(recipe.slug);
 
-  const relatedIngredientSlugs = selectedAnnotation.ingredientSlugs;
-  const relatedStepActions = selectedAnnotation.stepActions;
+  const updateConnection = useCallback(() => {
+    if (!activeIngredientSlug || !activeAnchor) {
+      setConnection(null);
+      return;
+    }
+
+    const workspace = workspaceRef.current;
+    const stage = stageRef.current;
+    const ingredientCard = ingredientElements.current.get(activeIngredientSlug);
+
+    if (!workspace || !stage || !ingredientCard) {
+      setConnection(null);
+      return;
+    }
+
+    const workspaceBounds = workspace.getBoundingClientRect();
+    const stageBounds = stage.getBoundingClientRect();
+    const cardBounds = ingredientCard.getBoundingClientRect();
+    const width = workspaceBounds.width;
+    const height = workspaceBounds.height;
+    const startX = cardBounds.left - workspaceBounds.left + 8;
+    const startY = cardBounds.top - workspaceBounds.top + cardBounds.height / 2;
+    const endX = stageBounds.left - workspaceBounds.left + (stageBounds.width * activeAnchor.x) / 100;
+    const endY = stageBounds.top - workspaceBounds.top + (stageBounds.height * activeAnchor.y) / 100;
+    const controlDistance = Math.max(56, Math.abs(startX - endX) * 0.42);
+    const path = `M ${startX} ${startY} C ${startX - controlDistance} ${startY}, ${endX + controlDistance} ${endY}, ${endX} ${endY}`;
+
+    setConnection({ width, height, path, endX, endY });
+  }, [activeAnchor, activeIngredientSlug]);
+
+  useLayoutEffect(() => {
+    const animationFrame = window.requestAnimationFrame(updateConnection);
+
+    const workspace = workspaceRef.current;
+
+    if (!workspace) {
+      return () => window.cancelAnimationFrame(animationFrame);
+    }
+
+    const resizeObserver = new ResizeObserver(updateConnection);
+    resizeObserver.observe(workspace);
+    window.addEventListener("resize", updateConnection);
+
+    return () => {
+      window.cancelAnimationFrame(animationFrame);
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", updateConnection);
+    };
+  }, [updateConnection]);
 
   return (
-    <main className="recipe-detail-page">
+    <main className={`recipe-detail-page${isTransitioning ? " is-transitioning" : ""}`}>
       <div className="recipe-detail-shell">
         <header className="recipe-detail-heading">
-          <div>
-            <h1
-              style={
-                recipe.name.length >= 12
-                  ? { fontSize: "4.1rem", lineHeight: 1 }
-                  : undefined
-              }
-            >
-              {recipe.name}
-            </h1>
-          </div>
+          <h1 className={recipe.name.length >= 12 ? "is-compact" : undefined}>{recipe.name}</h1>
           <p>{recipe.summary}</p>
         </header>
 
-        <section className="recipe-detail-explorer" aria-label={`${recipe.name} 配方探索`}>
+        <section
+          ref={workspaceRef}
+          className="recipe-detail-explorer"
+          aria-label={`${recipe.name} 配方探索`}
+        >
+          {connection ? (
+            <svg
+              key={activeIngredientSlug}
+              className="recipe-detail-connection"
+              aria-hidden="true"
+              viewBox={`0 0 ${connection.width} ${connection.height}`}
+              preserveAspectRatio="none"
+            >
+              <path className="recipe-detail-connection__path" pathLength="1" d={connection.path} />
+              <circle className="recipe-detail-connection__target" cx={connection.endX} cy={connection.endY} r="6" />
+              <circle className="recipe-detail-connection__core" cx={connection.endX} cy={connection.endY} r="2" />
+            </svg>
+          ) : null}
+
           <div className="recipe-detail-specimen">
-            <div className="recipe-detail-stage">
+            <div ref={stageRef} data-recipe-transition-target className="recipe-detail-stage">
               {recipe.imageUrl ? (
                 <Image
                   src={recipe.imageUrl}
                   alt={recipe.imageAlt ?? recipe.name}
                   fill
                   priority
-                  sizes="(max-width: 1023px) 100vw, 430px"
+                  sizes="(max-width: 1023px) 100vw, 600px"
                   unoptimized={isLocalRecipeImage(recipe.imageUrl)}
                   className="recipe-detail-stage__image"
                 />
@@ -217,78 +260,10 @@ export function RecipeDetailExplorer({ recipe }: RecipeDetailExplorerProps) {
                 <div className="recipe-detail-stage__fallback" aria-hidden="true" />
               )}
               <div className="recipe-detail-stage__veil" aria-hidden="true" />
-
-              {hasImageAnnotations ? (
-                <>
-                  <div className="recipe-detail-stage__markers" aria-label="风味与结构标注">
-                    {annotations.map((annotation) => {
-                      const isActive = annotation.id === selectedAnnotation.id;
-
-                      return (
-                        <button
-                          key={annotation.id}
-                          className={`recipe-detail-marker${isActive ? " is-active" : ""}`}
-                          style={
-                            {
-                              "--annotation-x": `${annotation.x}%`,
-                              "--annotation-y": `${annotation.y}%`
-                            } as CSSProperties
-                          }
-                          type="button"
-                          aria-pressed={isActive}
-                          aria-label={`查看${annotation.label}`}
-                          onClick={() => setSelectedId(annotation.id)}
-                        >
-                          <span>{annotation.order}</span>
-                          <span className="recipe-detail-marker__tooltip">{annotation.label}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <div className="recipe-detail-stage__caption">
-                    <span>点击标注</span>
-                    <strong>{selectedAnnotation.label}</strong>
-                  </div>
-                </>
-              ) : null}
             </div>
           </div>
 
-          <aside className="recipe-detail-console" aria-live="polite">
-            <div className="recipe-detail-console__signal">
-              <span>{selectedAnnotation.eyebrow}</span>
-              {hasImageAnnotations ? (
-                <span>
-                  {selectedAnnotation.order} / {String(annotations.length).padStart(2, "0")}
-                </span>
-              ) : null}
-            </div>
-
-            <div className="recipe-detail-insight">
-              <p>{selectedAnnotation.label}</p>
-              <h2>{selectedAnnotation.title}</h2>
-              <p>{selectedAnnotation.description}</p>
-              {selectedAnnotation.detail ? (
-                <span className="recipe-detail-insight__detail">{selectedAnnotation.detail}</span>
-              ) : null}
-            </div>
-
-            <dl className="recipe-detail-facts">
-              <div>
-                <dt>调制</dt>
-                <dd>{recipe.method}</dd>
-              </div>
-              <div>
-                <dt>总时长</dt>
-                <dd>{formatTotalDuration(recipe.prepTimeSeconds)}</dd>
-              </div>
-              <div>
-                <dt>酒精度</dt>
-                <dd>{recipe.estimatedAbv}</dd>
-              </div>
-            </dl>
-
+          <aside className="recipe-detail-console">
             <section className="recipe-detail-list recipe-detail-list--ingredients" aria-labelledby="recipe-ingredients-title">
               <div className="recipe-detail-list__heading">
                 <h2 id="recipe-ingredients-title">原料清单</h2>
@@ -296,12 +271,28 @@ export function RecipeDetailExplorer({ recipe }: RecipeDetailExplorerProps) {
               </div>
               <ol>
                 {recipe.ingredients.map((ingredient, index) => {
-                  const related = isRelated(ingredient.slug, relatedIngredientSlugs);
+                  const isActive = ingredient.slug === activeIngredientSlug;
+                  const anchor = ingredientAnchors.find(
+                    (item) => item.ingredientSlug === ingredient.slug
+                  );
 
                   return (
                     <li
                       key={ingredient.slug}
-                      className={`recipe-detail-ingredient-card${related ? " is-related" : ""}`}
+                      ref={(element) => {
+                        if (element) {
+                          ingredientElements.current.set(ingredient.slug, element);
+                        } else {
+                          ingredientElements.current.delete(ingredient.slug);
+                        }
+                      }}
+                      className={`recipe-detail-ingredient-card${anchor ? " has-anchor" : ""}${isActive ? " is-active" : ""}`}
+                      tabIndex={anchor ? 0 : undefined}
+                      aria-label={anchor ? `${ingredient.name}，${anchor.label}` : undefined}
+                      onPointerEnter={() => anchor && setActiveIngredientSlug(ingredient.slug)}
+                      onPointerLeave={() => setActiveIngredientSlug(null)}
+                      onFocus={() => anchor && setActiveIngredientSlug(ingredient.slug)}
+                      onBlur={() => setActiveIngredientSlug(null)}
                     >
                       <span className="recipe-detail-list__index">{String(index + 1).padStart(2, "0")}</span>
                       <div>
@@ -328,11 +319,10 @@ export function RecipeDetailExplorer({ recipe }: RecipeDetailExplorerProps) {
               </div>
               <ol>
                 {recipe.detailedSteps.map((step) => {
-                  const related = isRelated(step.actionType, relatedStepActions);
                   const duration = formatDuration(step.durationSeconds);
 
                   return (
-                    <li key={step.stepNumber} className={related ? "is-related" : undefined}>
+                    <li key={step.stepNumber}>
                       <span className="recipe-detail-list__index">{String(step.stepNumber).padStart(2, "0")}</span>
                       <div>
                         <div className="recipe-detail-list__line">
