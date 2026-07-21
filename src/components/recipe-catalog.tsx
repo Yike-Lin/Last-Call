@@ -10,6 +10,7 @@ import { Flip } from "gsap/Flip";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "motion/react";
 import type { RecipeCard, RecipeTag } from "@/lib/recipes";
+import { useRecipeTransition } from "@/components/recipe-transition-provider";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger, Flip);
 
@@ -49,6 +50,23 @@ const spiritStages: Array<{
   { category: "威士忌", stage: "#e4d6cc", accent: "#a84f38" },
   { category: "白兰地", stage: "#ead8ca", accent: "#9f6446" }
 ];
+
+const recipeTransitionThemes: Record<string, { accent: string; wash: string }> = {
+  aviation: { accent: "#7d72ab", wash: "#ddd9ed" },
+  "clover-club": { accent: "#be6670", wash: "#f0d9da" },
+  "french-75": { accent: "#a98642", wash: "#eee3c8" },
+  margarita: { accent: "#6c8a69", wash: "#dce8d8" },
+  mojito: { accent: "#638d75", wash: "#d8e8de" },
+  negroni: { accent: "#bd5b37", wash: "#efd4c8" },
+  "old-fashioned": { accent: "#aa7135", wash: "#ead9c7" },
+  "whiskey-sour": { accent: "#c48b41", wash: "#f0dfc2" },
+  "moscow-mule": { accent: "#a46748", wash: "#ead9d0" },
+  boulevardier: { accent: "#a9583d", wash: "#ecd4ca" },
+  manhattan: { accent: "#8f5144", wash: "#ead8d2" },
+  sidecar: { accent: "#bf7941", wash: "#eedcc8" },
+  daiquiri: { accent: "#77946e", wash: "#dfe9d9" },
+  "dry-martini": { accent: "#7c9178", wash: "#dfe6dc" }
+};
 
 const spiritAliases: Record<Exclude<SpiritFilter, "全部">, string[]> = {
   金酒: ["金酒", "杜松子酒", "gin"],
@@ -207,6 +225,15 @@ function getSpiritStage(baseSpiritCategory: string) {
   );
 }
 
+function getRecipeTransitionTheme(recipe: RecipeCard) {
+  const stage = getSpiritStage(recipe.baseSpirits[0]?.category ?? recipe.baseSpiritCategory);
+
+  return recipeTransitionThemes[recipe.slug] ?? {
+    accent: stage.accent,
+    wash: stage.stage
+  };
+}
+
 function getBaseSpiritSummary(recipe: RecipeCard) {
   const spirits = recipe.baseSpirits.filter((spirit) => spirit.category !== "其他");
 
@@ -355,6 +382,7 @@ export function RecipeCatalog({
   selectedSpirit
 }: RecipeCatalogProps) {
   const prefersReducedMotion = useReducedMotion();
+  const { startRecipeTransition } = useRecipeTransition();
   const productsRef = useRef<HTMLElement | null>(null);
   const pendingFilterState = useRef<ReturnType<typeof Flip.getState> | null>(null);
   const [isFilterRailCompact, setIsFilterRailCompact] = useState(false);
@@ -704,6 +732,36 @@ export function RecipeCatalog({
                   <Link
                     href={`/recipes/${recipe.slug}`}
                     className="recipe-catalog-card__link"
+                    onClick={(event) => {
+                      if (
+                        event.button !== 0 ||
+                        event.metaKey ||
+                        event.altKey ||
+                        event.ctrlKey ||
+                        event.shiftKey ||
+                        !imageSource
+                      ) {
+                        return;
+                      }
+
+                      const media = (event.target as HTMLElement).closest<HTMLElement>(
+                        ".recipe-catalog-card__media"
+                      );
+
+                      if (!media) {
+                        return;
+                      }
+
+                      event.preventDefault();
+                      startRecipeTransition({
+                        href: `/recipes/${recipe.slug}`,
+                        imageAlt: recipe.imageAlt ?? recipe.name,
+                        imageUrl: imageSource,
+                        slug: recipe.slug,
+                        sourceElement: media,
+                        theme: getRecipeTransitionTheme(recipe)
+                      });
+                    }}
                   >
                     <span
                       className="recipe-catalog-card__media"
