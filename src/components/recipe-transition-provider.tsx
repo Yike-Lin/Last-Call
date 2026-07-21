@@ -4,14 +4,11 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useRef,
   useState,
-  type CSSProperties,
   type ReactNode
 } from "react";
-import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
 
@@ -25,45 +22,47 @@ type TransitionTheme = {
 type TransitionRequest = {
   slug: string;
   href: string;
-  imageAlt: string;
-  imageUrl: string;
-  sourceElement: HTMLElement;
   theme: TransitionTheme;
 };
 
-type ActiveTransition = Omit<TransitionRequest, "sourceElement"> & {
+type ActiveTransition = TransitionRequest & {
   id: number;
-  phase: "exiting" | "entering";
-  sourceElement: HTMLElement;
-  sourceRect: DOMRect;
-  targetRect?: DOMRect;
 };
 
 type RecipeTransitionContextValue = {
-  isTransitioningTo: (slug: string) => boolean;
   startRecipeTransition: (request: TransitionRequest) => void;
 };
 
 const recipeTransitionContext = createContext<RecipeTransitionContextValue | null>(null);
 
-const liquidPathStart =
-  "M 0 900 C 210 842 340 888 518 848 C 720 804 834 878 1032 842 C 1214 810 1330 850 1440 818 L 1440 900 L 0 900 Z";
-const liquidPathRise =
-  "M 0 518 C 192 422 364 602 548 496 C 734 386 890 570 1056 458 C 1214 352 1338 468 1440 402 L 1440 900 L 0 900 Z";
-const liquidPathSettle =
-  "M 0 796 C 192 742 360 822 546 778 C 744 730 892 806 1062 762 C 1210 724 1330 782 1440 740 L 1440 900 L 0 900 Z";
+const numberOfPoints = 10;
+const pointDelayMaximum = 0.16;
+const baseLayerDelay = 0.11;
+const waveDuration = 0.78;
+const retreatDuration = 0.68;
+const retreatStart = 1.08;
 
-function isLocalRecipeImage(imageUrl: string) {
-  return imageUrl.startsWith("http://127.0.0.1") || imageUrl.startsWith("http://localhost");
+function getLiquidPath(points: number[]) {
+  let path = `M 0 0 V ${points[0]} C`;
+
+  for (let index = 0; index < numberOfPoints - 1; index += 1) {
+    const point = ((index + 1) / (numberOfPoints - 1)) * 100;
+    const controlPoint = point - 100 / (numberOfPoints - 1) / 2;
+
+    path += ` ${controlPoint} ${points[index]} ${controlPoint} ${points[index + 1]} ${point} ${points[index + 1]}`;
+  }
+
+  return `${path} V 100 H 0 Z`;
 }
 
 export function RecipeTransitionProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const pathname = usePathname();
   const overlayRef = useRef<HTMLDivElement>(null);
-  const imageRef = useRef<HTMLDivElement>(null);
-  const liquidPathRef = useRef<SVGPathElement>(null);
+  const baseLiquidPathRef = useRef<SVGPathElement>(null);
+  const accentLiquidPathRef = useRef<SVGPathElement>(null);
   const animationRef = useRef<gsap.core.Timeline | null>(null);
+  const basePointsRef = useRef<number[]>(Array(numberOfPoints).fill(100));
+  const accentPointsRef = useRef<number[]>(Array(numberOfPoints).fill(100));
   const transitionSequence = useRef(0);
   const [transition, setTransition] = useState<ActiveTransition | null>(null);
 
@@ -76,153 +75,86 @@ export function RecipeTransitionProvider({ children }: { children: ReactNode }) 
         return;
       }
 
-      const sourceRect = request.sourceElement.getBoundingClientRect();
-
-      if (sourceRect.width === 0 || sourceRect.height === 0) {
-        router.push(request.href);
-        return;
-      }
-
-      request.sourceElement.style.opacity = "0";
       transitionSequence.current += 1;
       setTransition({
         ...request,
-        id: transitionSequence.current,
-        phase: "exiting",
-        sourceRect
+        id: transitionSequence.current
       });
     },
     [router, transition]
   );
 
-  useEffect(() => {
-    if (!transition || transition.phase !== "exiting" || pathname !== transition.href) {
-      return;
-    }
-
-    let animationFrame = 0;
-    let attempts = 0;
-
-    const findTarget = () => {
-      const target = document.querySelector<HTMLElement>("[data-recipe-transition-target]");
-
-      if (target) {
-        const targetRect = target.getBoundingClientRect();
-
-        if (targetRect.width > 0 && targetRect.height > 0) {
-          setTransition((current) =>
-            current && current.id === transition.id
-              ? { ...current, phase: "entering", targetRect }
-              : current
-          );
-          return;
-        }
-      }
-
-      attempts += 1;
-
-      if (attempts < 12) {
-        animationFrame = window.requestAnimationFrame(findTarget);
-      }
-    };
-
-    animationFrame = window.requestAnimationFrame(findTarget);
-
-    return () => window.cancelAnimationFrame(animationFrame);
-  }, [pathname, transition]);
-
   useGSAP(
     () => {
-      if (!transition || !overlayRef.current || !imageRef.current || !liquidPathRef.current) {
+      if (
+        !transition ||
+        !overlayRef.current ||
+        !baseLiquidPathRef.current ||
+        !accentLiquidPathRef.current
+      ) {
         return;
       }
 
       const overlay = overlayRef.current;
-      const image = imageRef.current;
-      const liquidPath = liquidPathRef.current;
+      const baseLiquidPath = baseLiquidPathRef.current;
+      const accentLiquidPath = accentLiquidPathRef.current;
+      const basePoints = basePointsRef.current;
+      const accentPoints = accentPointsRef.current;
 
-      // Route rendering can overlap the exit beat. Freeze the previous beat at its
-      // current visual state, then let the next one take over from that position.
+      const renderPaths = () => {
+        baseLiquidPath.setAttribute("d", getLiquidPath(basePoints));
+        accentLiquidPath.setAttribute("d", getLiquidPath(accentPoints));
+      };
+
       animationRef.current?.kill();
-      gsap.killTweensOf([overlay, image, liquidPath]);
+      gsap.killTweensOf([overlay, baseLiquidPath, accentLiquidPath]);
 
-      if (transition.phase === "exiting") {
-        gsap.set(overlay, { autoAlpha: 1 });
-        gsap.set(image, {
-          borderRadius: 8,
-          height: transition.sourceRect.height,
-          left: transition.sourceRect.left,
-          scale: 1,
-          top: transition.sourceRect.top,
-          width: transition.sourceRect.width
-        });
-        gsap.set(liquidPath, { attr: { d: liquidPathStart }, opacity: 0.42 });
+      basePoints.fill(100);
+      accentPoints.fill(100);
+      renderPaths();
+      gsap.set(overlay, { autoAlpha: 1 });
+      gsap.set([baseLiquidPath, accentLiquidPath], { autoAlpha: 1 });
 
-        const timeline = gsap.timeline();
-        animationRef.current = timeline;
-
-        timeline
-          .to(liquidPath, {
-            attr: { d: liquidPathRise },
-            duration: 0.78,
-            ease: "power3.inOut"
-          })
-          .to(
-            image,
-            {
-              duration: 0.52,
-              ease: "power2.inOut",
-              scale: 1.035
-            },
-            0
-          )
-          .call(() => router.push(transition.href), [], 0.32);
-
-        return () => {
-          if (animationRef.current === timeline) {
-            timeline.kill();
-          }
-        };
-      }
-
-      if (!transition.targetRect) {
-        return;
-      }
+      const pointDelays = Array.from({ length: numberOfPoints }, () =>
+        gsap.utils.random(0, pointDelayMaximum)
+      );
 
       const timeline = gsap.timeline({
+        defaults: {
+          duration: waveDuration,
+          ease: "power2.inOut"
+        },
+        onUpdate: renderPaths,
         onComplete: () => {
-          transition.sourceElement.style.opacity = "";
           animationRef.current = null;
           setTransition((current) => (current?.id === transition.id ? null : current));
         }
       });
       animationRef.current = timeline;
 
+      pointDelays.forEach((delay, index) => {
+        timeline.to(accentPoints, { [index]: 0 }, delay);
+        timeline.to(basePoints, { [index]: 0 }, delay + baseLayerDelay);
+      });
+
+      timeline.call(() => router.push(transition.href), [], 0.3);
+
+      pointDelays.forEach((delay, index) => {
+        timeline.to(
+          accentPoints,
+          { [index]: 100, duration: retreatDuration },
+          retreatStart + delay * 0.72
+        );
+        timeline.to(
+          basePoints,
+          { [index]: 100, duration: retreatDuration },
+          retreatStart + baseLayerDelay + delay * 0.72
+        );
+      });
+
       timeline
-        .to(
-          image,
-          {
-            borderRadius: 0,
-            duration: 1.02,
-            ease: "power3.inOut",
-            height: transition.targetRect.height,
-            left: transition.targetRect.left,
-            scale: 1,
-            top: transition.targetRect.top,
-            width: transition.targetRect.width
-          },
-          0
-        )
-        .to(
-          liquidPath,
-          {
-            attr: { d: liquidPathSettle },
-            duration: 1.08,
-            ease: "power3.inOut"
-          },
-          0
-        )
-        .to(overlay, { autoAlpha: 0, duration: 0.34, ease: "power1.out" }, 0.78);
+        .to(baseLiquidPath, { autoAlpha: 0, duration: 0.66, ease: "sine.inOut" }, retreatStart - 0.06)
+        .to(accentLiquidPath, { autoAlpha: 0, duration: 0.5, ease: "sine.out" }, retreatStart + 0.12);
 
       return () => {
         if (animationRef.current === timeline) {
@@ -231,16 +163,13 @@ export function RecipeTransitionProvider({ children }: { children: ReactNode }) 
       };
     },
     {
-      dependencies: [transition?.id, transition?.phase],
+      dependencies: [transition?.id],
       revertOnUpdate: false,
       scope: overlayRef
     }
   );
 
-  const contextValue: RecipeTransitionContextValue = {
-    isTransitioningTo: (slug) => transition?.slug === slug,
-    startRecipeTransition
-  };
+  const contextValue: RecipeTransitionContextValue = { startRecipeTransition };
 
   return (
     <recipeTransitionContext.Provider value={contextValue}>
@@ -249,27 +178,31 @@ export function RecipeTransitionProvider({ children }: { children: ReactNode }) 
         <div
           ref={overlayRef}
           className="recipe-transition-overlay"
-          style={
-            {
-              "--recipe-transition-accent": transition.theme.accent,
-              "--recipe-transition-wash": transition.theme.wash
-            } as CSSProperties
-          }
           aria-hidden="true"
         >
-          <svg className="recipe-transition-overlay__liquid" viewBox="0 0 1440 900" preserveAspectRatio="none">
-            <path ref={liquidPathRef} />
-          </svg>
-          <div ref={imageRef} className="recipe-transition-overlay__image">
-            <Image
-              src={transition.imageUrl}
-              alt=""
-              fill
-              priority
-              sizes="100vw"
-              unoptimized={isLocalRecipeImage(transition.imageUrl)}
+          <svg className="recipe-transition-overlay__liquid" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id={`recipe-transition-base-${transition.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="#f8f8f3" />
+                <stop offset="100%" stopColor={transition.theme.wash} />
+              </linearGradient>
+              <linearGradient id={`recipe-transition-accent-${transition.id}`} x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor={transition.theme.accent} />
+                <stop offset="52%" stopColor={transition.theme.wash} />
+                <stop offset="100%" stopColor="#f1f2ec" />
+              </linearGradient>
+            </defs>
+            <path
+              ref={baseLiquidPathRef}
+              className="recipe-transition-overlay__liquid-base"
+              fill={`url(#recipe-transition-base-${transition.id})`}
             />
-          </div>
+            <path
+              ref={accentLiquidPathRef}
+              className="recipe-transition-overlay__liquid-accent"
+              fill={`url(#recipe-transition-accent-${transition.id})`}
+            />
+          </svg>
         </div>
       ) : null}
     </recipeTransitionContext.Provider>

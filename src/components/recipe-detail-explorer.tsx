@@ -4,7 +4,6 @@ import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { RecipeCard } from "@/lib/recipes";
-import { useRecipeTransition } from "@/components/recipe-transition-provider";
 
 type IngredientAnchor = {
   ingredientSlug: string;
@@ -155,7 +154,6 @@ type RecipeDetailExplorerProps = {
 };
 
 export function RecipeDetailExplorer({ recipe }: RecipeDetailExplorerProps) {
-  const { isTransitioningTo } = useRecipeTransition();
   const workspaceRef = useRef<HTMLElement>(null);
   const stageRef = useRef<HTMLDivElement>(null);
   const ingredientElements = useRef(new Map<string, HTMLLIElement>());
@@ -165,7 +163,6 @@ export function RecipeDetailExplorer({ recipe }: RecipeDetailExplorerProps) {
   const activeAnchor = ingredientAnchors.find(
     (anchor) => anchor.ingredientSlug === activeIngredientSlug
   );
-  const isTransitioning = isTransitioningTo(recipe.slug);
 
   const updateConnection = useCallback(() => {
     if (!activeIngredientSlug || !activeAnchor) {
@@ -218,7 +215,7 @@ export function RecipeDetailExplorer({ recipe }: RecipeDetailExplorerProps) {
   }, [updateConnection]);
 
   return (
-    <main className={`recipe-detail-page${isTransitioning ? " is-transitioning" : ""}`}>
+    <main className="recipe-detail-page">
       <div className="recipe-detail-shell">
         <header className="recipe-detail-heading">
           <h1 className={recipe.name.length >= 12 ? "is-compact" : undefined}>{recipe.name}</h1>
@@ -245,7 +242,7 @@ export function RecipeDetailExplorer({ recipe }: RecipeDetailExplorerProps) {
           ) : null}
 
           <div className="recipe-detail-specimen">
-            <div ref={stageRef} data-recipe-transition-target className="recipe-detail-stage">
+            <div ref={stageRef} className="recipe-detail-stage">
               {recipe.imageUrl ? (
                 <Image
                   src={recipe.imageUrl}

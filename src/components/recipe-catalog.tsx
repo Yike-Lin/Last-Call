@@ -744,21 +744,10 @@ export function RecipeCatalog({
                         return;
                       }
 
-                      const media = (event.target as HTMLElement).closest<HTMLElement>(
-                        ".recipe-catalog-card__media"
-                      );
-
-                      if (!media) {
-                        return;
-                      }
-
                       event.preventDefault();
                       startRecipeTransition({
                         href: `/recipes/${recipe.slug}`,
-                        imageAlt: recipe.imageAlt ?? recipe.name,
-                        imageUrl: imageSource,
                         slug: recipe.slug,
-                        sourceElement: media,
                         theme: getRecipeTransitionTheme(recipe)
                       });
                     }}
