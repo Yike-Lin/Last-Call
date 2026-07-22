@@ -802,3 +802,6 @@ set
 
 -- Keep the third IBA batch available when the local database is reseeded.
 \ir migrations/202607210004_iba_recipe_batch_three.sql
+
+-- Keep the fourth IBA batch available when the local database is reseeded.
+\ir migrations/202607220001_iba_recipe_batch_four.sql
