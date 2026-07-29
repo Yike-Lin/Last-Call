@@ -46,7 +46,7 @@ export default function MixPage() {
       <section className="panel flex flex-col items-center justify-center gap-6 p-6">
         <div className="text-center">
           <p className="text-muted text-xs uppercase tracking-wide">当前调制</p>
-          <h2 className="mt-2 text-2xl font-semibold">内格罗尼 Negroni</h2>
+          <h2 className="mt-2 text-2xl font-semibold">尼格罗尼 Negroni</h2>
         </div>
 
         <div className="mix-stage">

@@ -18,7 +18,7 @@ export type RecipeCard = {
 export const recipes: RecipeCard[] = [
   {
     slug: "negroni",
-    name: "内格罗尼 Negroni",
+    name: "尼格罗尼 Negroni",
     baseSpirit: "金酒",
     summary: "一款苦感鲜明、酒体前置的经典鸡尾酒，由等量金酒、金巴利和甜味美思组成。",
     tags: ["苦感", "草本", "短饮"],

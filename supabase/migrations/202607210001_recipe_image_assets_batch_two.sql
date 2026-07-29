@@ -19,8 +19,8 @@ select
   0
 from (
   values
-    ('french-75', 'french-75/card.png', '法国 75 鸡尾酒，香槟笛形杯盛装，金色气泡酒液与柠檬装饰。', 1168, 912),
-    ('boulevardier', 'boulevardier/card.png', '林荫大道鸡尾酒，冰镇鸡尾酒杯盛装，琥珀红色酒液与橙皮装饰。', 1168, 912)
+    ('french-75', 'french-75/card.png', '法国75鸡尾酒，香槟笛形杯盛装，金色气泡酒液与柠檬装饰。', 1168, 912),
+    ('boulevardier', 'boulevardier/card.png', '花花公子鸡尾酒，冰镇鸡尾酒杯盛装，琥珀红色酒液与橙皮装饰。', 1168, 912)
 ) as v(recipe_slug, storage_path, alt_text, width, height)
 join public.recipes r on r.slug = v.recipe_slug
 on conflict (storage_path) do update

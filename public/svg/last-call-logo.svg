@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" aria-hidden="true">
+  <symbol id="last-call-logo-mark" viewBox="0 0 128 128">
+    <g
+      fill="none"
+      stroke="currentColor"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="3.2"
+    >
+      <path d="M24 31c15-4 49-4 68 0" />
+      <path d="M24 31l28 45c7 10 20 10 27 0l20-34" />
+      <path d="M34 43c14-3 37-3 56 0" />
+      <path stroke="var(--last-call-accent, currentColor)" d="M37 44c14 5 35 5 51 0" />
+      <path d="M58 82c5 8 5 21 3 29" />
+      <path d="M72 82c-5 8-5 21-3 29" />
+      <path d="M47 114c11 5 25 5 36 0" />
+      <path d="M40 119c15 6 35 6 50 0" />
+
+      <circle fill="#f2c94c" stroke="none" cx="88" cy="42" r="17.5" opacity="0.94" />
+      <circle cx="88" cy="42" r="17.5" />
+      <circle cx="88" cy="42" r="13.5" />
+      <circle stroke="#624118" cx="88" cy="42" r="3.2" />
+      <path stroke="#624118" stroke-width="2.4" d="M88 42V31" />
+      <path stroke="#624118" stroke-width="2.4" d="M88 42l8-8" />
+      <path stroke="var(--last-call-accent, currentColor)" d="M88 42l-11 6" />
+      <path stroke="var(--last-call-accent, currentColor)" d="M88 42l6 12" />
+
+      <path stroke="#624118" stroke-width="2.2" d="M88 28v3" />
+      <path stroke="#624118" stroke-width="2.2" d="M88 53v3" />
+      <path stroke="#624118" stroke-width="2.2" d="M74 42h3" />
+      <path stroke="#624118" stroke-width="2.2" d="M99 42h3" />
+      <path stroke="#624118" stroke-width="2.2" d="M80 33l2 2" />
+      <path stroke="#624118" stroke-width="2.2" d="M98 51l-2-2" />
+      <path stroke="#624118" stroke-width="2.2" d="M79 56l9-14" />
+      <path d="M67 43c8 3 23 3 34-1" />
+      <path d="M73 47c7 2 15 2 24-1" />
+    </g>
+    <circle fill="var(--last-call-accent, currentColor)" cx="88" cy="42" r="1.5" />
+  </symbol>
+
+  <use
+    href="#last-call-logo-mark"
+    color="#efece5"
+    style="--last-call-accent: #d46a42"
+  />
+</svg>
