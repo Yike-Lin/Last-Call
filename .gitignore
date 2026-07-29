@@ -24,3 +24,7 @@ assets/recipe-images/upload/**
 # Temporary AI exports are local handoff files, not deploy assets.
 public/images/AI/**
 !public/images/AI/.gitkeep
+
+output/
+.playwright-cli/
+tools/blender_mcp/

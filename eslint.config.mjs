@@ -3,7 +3,12 @@ import nextTypescript from "eslint-config-next/typescript";
 
 const config = [
   {
-    ignores: [".agents/**", ".next/**", "node_modules/**"]
+    ignores: [
+      ".agents/**",
+      ".next/**",
+      "node_modules/**",
+      "tools/blender_mcp/**"
+    ]
   },
   ...nextVitals,
   ...nextTypescript
