@@ -109,7 +109,11 @@ export function FeaturedCocktails({ recipes }: FeaturedCocktailsProps) {
                   }
                 >
                   <Link href={`/recipes/${recipe.slug}`} className="featured-cocktail__link">
-                    <span className="featured-cocktail__media" aria-hidden="true">
+                    <span
+                      className="featured-cocktail__media"
+                      aria-hidden="true"
+                      style={{ position: "relative" }}
+                    >
                       <Image
                         src="/images/home-cocktail.jpg"
                         alt=""
