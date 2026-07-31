@@ -15,7 +15,7 @@ export default function HomePage() {
 
       <section className="craft-section" aria-labelledby="craft-title">
         <div className="craft-section__shell">
-          <div className="craft-section__media">
+          <div className="craft-section__media" style={{ position: "relative" }}>
             <Image
               src="/images/home-cocktail.jpg"
               alt="一杯正在吧台上完成的琥珀色鸡尾酒"
