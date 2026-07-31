@@ -2873,6 +2873,174 @@ body:has(.home-page) .bg-surface {
   background: linear-gradient(90deg, var(--home-accent), transparent);
 }
 
+.craft-section {
+  position: relative;
+  overflow: hidden;
+  padding: clamp(104px, 13vh, 172px) 0;
+  background: #e9e4d9;
+  color: #1b2420;
+}
+
+.craft-section::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 44%;
+  height: 100%;
+  background:
+    linear-gradient(90deg, transparent, rgba(112, 122, 88, 0.08)),
+    repeating-linear-gradient(0deg, rgba(27, 36, 32, 0.028) 0 1px, transparent 1px 5px);
+  content: "";
+  pointer-events: none;
+}
+
+.craft-section__shell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 0.94fr) minmax(360px, 0.86fr);
+  align-items: center;
+  gap: clamp(44px, 8vw, 128px);
+  width: min(1180px, calc(100vw - 32px));
+  margin: 0 auto;
+}
+
+.craft-section__media {
+  position: relative;
+  min-height: min(67vh, 650px);
+  overflow: hidden;
+  background: #252b25;
+}
+
+.craft-section__image {
+  object-fit: cover;
+  object-position: 50% 48%;
+  filter: saturate(0.78) contrast(1.04) sepia(0.08);
+  transform: scale(1.02);
+}
+
+.craft-section__media::after {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(27, 36, 32, 0.02), rgba(27, 36, 32, 0.44)),
+    linear-gradient(90deg, rgba(27, 36, 32, 0.2), transparent 45%);
+  content: "";
+  pointer-events: none;
+}
+
+.craft-section__media-frame {
+  position: absolute;
+  z-index: 2;
+  inset: 16px;
+  border: 1px solid rgba(233, 228, 217, 0.56);
+  pointer-events: none;
+}
+
+.craft-section__media-caption {
+  position: absolute;
+  right: 28px;
+  bottom: 27px;
+  z-index: 3;
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  color: rgba(233, 228, 217, 0.72);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  text-align: right;
+}
+
+.craft-section__media-caption strong {
+  color: #f2e7d5;
+  font-family: var(--font-mouse-memoirs), "Arial Narrow", sans-serif;
+  font-size: 1.7rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+
+.craft-section__copy {
+  display: grid;
+  align-content: center;
+  max-width: 500px;
+}
+
+.craft-section__eyebrow {
+  margin: 0 0 24px;
+  color: #707a58;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+}
+
+.craft-section__copy h2 {
+  margin: 0;
+  color: #1b2420;
+  font-family: var(--font-mouse-memoirs), "Arial Narrow", sans-serif;
+  font-size: clamp(4rem, 6.7vw, 6.6rem);
+  font-weight: 400;
+  letter-spacing: 0.015em;
+  line-height: 0.8;
+}
+
+.craft-section__statement {
+  margin: 34px 0 0;
+  color: #536059;
+  font-family: var(--font-zcool-kuaile), "Microsoft YaHei", sans-serif;
+  font-size: clamp(1.2rem, 1.7vw, 1.5rem);
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.craft-section__rule {
+  width: 100%;
+  height: 1px;
+  margin: 38px 0 19px;
+  background: rgba(27, 36, 32, 0.24);
+}
+
+.craft-section__notes {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18px;
+  color: #78817a;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.craft-section__notes strong {
+  color: #536059;
+  font-size: 0.58rem;
+  font-weight: 800;
+  text-align: right;
+}
+
+.craft-section__link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: min(100%, 220px);
+  margin-top: 40px;
+  border-bottom: 1px solid #bd5a32;
+  padding: 0 0 8px;
+  color: #1b2420;
+  font-size: 0.88rem;
+  font-weight: 800;
+  transition: color 180ms ease, gap 180ms ease;
+}
+
+.craft-section__link:hover,
+.craft-section__link:focus-visible {
+  gap: 20px;
+  color: #bd5a32;
+  outline: 0;
+}
+
 .home-button {
   display: inline-flex;
   min-height: 48px;
@@ -3425,6 +3593,43 @@ body:has(.home-page) .bg-surface {
 
   .featured-cocktails {
     padding: 96px 0 92px;
+  }
+
+  .craft-section {
+    padding: 86px 0 92px;
+  }
+
+  .craft-section__shell {
+    grid-template-columns: 1fr;
+    gap: 42px;
+    width: min(100%, calc(100vw - 36px));
+  }
+
+  .craft-section__media {
+    min-height: 68vh;
+  }
+
+  .craft-section__copy {
+    max-width: none;
+  }
+
+  .craft-section__copy h2 {
+    font-size: clamp(4rem, 16vw, 5.4rem);
+  }
+
+  .craft-section__notes {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .craft-section__notes strong {
+    text-align: left;
+  }
+
+  .craft-section__link {
+    width: min(100%, 240px);
+    margin-top: 34px;
   }
 
   .featured-cocktails__heading {
