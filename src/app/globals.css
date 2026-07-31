@@ -2239,6 +2239,309 @@ body:has(.home-page) .bg-surface {
   background: linear-gradient(180deg, var(--home-accent), transparent);
 }
 
+.flavor-compass {
+  --flavor-accent: #f2e7d5;
+  --flavor-glow: rgba(242, 231, 213, 0.2);
+  position: relative;
+  min-height: 100dvh;
+  overflow: hidden;
+  padding: clamp(104px, 12vh, 160px) 0 140px;
+  background:
+    radial-gradient(circle at 50% 52%, var(--flavor-glow), transparent 29%),
+    linear-gradient(180deg, #0b0a08, #120b08 48%, #0b0a08);
+  color: var(--home-text);
+  transition: background 420ms ease;
+}
+
+.flavor-compass::before,
+.flavor-compass::after {
+  position: absolute;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(242, 231, 213, 0.12), transparent);
+  content: "";
+}
+
+.flavor-compass::before {
+  top: 0;
+}
+
+.flavor-compass::after {
+  bottom: 0;
+}
+
+.flavor-compass__wash {
+  position: absolute;
+  top: 19%;
+  left: 50%;
+  width: min(60vw, 800px);
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--flavor-accent) 30%, transparent);
+  border-radius: 50%;
+  opacity: 0.6;
+  transform: translateX(-50%);
+  transition: border-color 420ms ease;
+  pointer-events: none;
+}
+
+.flavor-compass__shell {
+  position: relative;
+  z-index: 1;
+  width: min(1180px, calc(100vw - 32px));
+  margin: 0 auto;
+}
+
+.flavor-compass__intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 0.42fr);
+  align-items: end;
+  gap: 44px;
+  will-change: transform, opacity;
+}
+
+.flavor-compass__eyebrow {
+  margin: 0 0 18px;
+  color: var(--flavor-accent);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  transition: color 420ms ease;
+}
+
+.flavor-compass__intro h2 {
+  max-width: 13ch;
+  margin: 0;
+  color: var(--home-text);
+  font-family: var(--font-mouse-memoirs), "Arial Narrow", sans-serif;
+  font-size: clamp(3.6rem, 7.2vw, 6.6rem);
+  font-weight: 400;
+  letter-spacing: 0.015em;
+  line-height: 0.8;
+  text-transform: uppercase;
+}
+
+.flavor-compass__lede {
+  margin: 26px 0 0;
+  color: rgba(242, 231, 213, 0.66);
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+.flavor-compass__signal {
+  display: grid;
+  justify-items: start;
+  gap: 9px;
+  border-top: 1px solid color-mix(in srgb, var(--flavor-accent) 48%, transparent);
+  padding-top: 16px;
+  transition: border-color 420ms ease;
+  will-change: transform, opacity;
+}
+
+.flavor-compass__signal span,
+.flavor-compass__signal small {
+  color: rgba(242, 231, 213, 0.5);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+}
+
+.flavor-compass__signal strong {
+  color: var(--flavor-accent);
+  font-family: var(--font-zcool-kuaile), "Microsoft YaHei", sans-serif;
+  font-size: clamp(1.7rem, 2.8vw, 2.25rem);
+  font-weight: 400;
+  line-height: 1;
+  transition: color 420ms ease;
+}
+
+.flavor-compass__signal small {
+  max-width: 18rem;
+  color: rgba(242, 231, 213, 0.64);
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.55;
+}
+
+.flavor-compass__stage {
+  position: relative;
+  min-height: min(76vh, 760px);
+  margin-top: 26px;
+}
+
+.flavor-compass__track {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  width: min(62vw, 750px);
+  aspect-ratio: 2.6;
+  border: 1px solid color-mix(in srgb, var(--flavor-accent) 36%, transparent);
+  border-radius: 50%;
+  opacity: 0.64;
+  box-shadow: 0 0 64px var(--flavor-glow);
+  transform: translate(-50%, -50%) rotate(-12deg);
+  transition:
+    border-color 420ms ease,
+    box-shadow 420ms ease;
+}
+
+.flavor-compass__track::after {
+  position: absolute;
+  top: -4px;
+  left: 18%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--flavor-accent);
+  box-shadow: 0 0 0 8px color-mix(in srgb, var(--flavor-accent) 16%, transparent);
+  content: "";
+  transition: background 420ms ease, box-shadow 420ms ease;
+}
+
+.flavor-compass__glass {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(35vw, 430px);
+  aspect-ratio: 800 / 1100;
+  transform: translate(-50%, -50%);
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+
+.flavor-compass__layer {
+  position: absolute;
+  inset: 0;
+  object-fit: contain;
+  transform-style: preserve-3d;
+  pointer-events: none;
+  user-select: none;
+}
+
+.flavor-compass__layer--shadow {
+  transform: translateZ(-28px) scale(0.98);
+}
+
+.flavor-compass__layer--liquid {
+  transform: translateZ(8px);
+}
+
+.flavor-compass__layer--ice {
+  transform: translateZ(28px);
+}
+
+.flavor-compass__layer--splash {
+  transform: translateZ(42px);
+}
+
+.flavor-compass__layer--bubbles {
+  transform: translateZ(55px);
+}
+
+.flavor-compass__layer--outline {
+  transform: translateZ(70px);
+}
+
+.flavor-compass__layer--garnish {
+  transform: translateZ(92px);
+}
+
+.flavor-compass__options {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+}
+
+.flavor-compass__option {
+  position: absolute;
+  top: var(--option-y);
+  left: var(--option-x);
+  display: grid;
+  grid-template-columns: auto auto;
+  align-items: center;
+  gap: 0 9px;
+  min-width: 90px;
+  border-bottom: 1px solid color-mix(in srgb, var(--option-accent) 50%, transparent);
+  padding: 8px 0 9px;
+  color: rgba(242, 231, 213, 0.74);
+  transform: translate(-50%, -50%);
+  transition:
+    color 240ms ease,
+    border-color 240ms ease,
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+}
+
+.flavor-compass__option-dot {
+  grid-row: span 2;
+  display: block;
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--option-accent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--option-accent) 38%, transparent);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--option-accent) 10%, transparent);
+  transition: background 240ms ease, box-shadow 240ms ease;
+}
+
+.flavor-compass__option > span:not(.flavor-compass__option-dot) {
+  font-family: var(--font-zcool-kuaile), "Microsoft YaHei", sans-serif;
+  font-size: 1.18rem;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.flavor-compass__option small {
+  color: rgba(242, 231, 213, 0.4);
+  font-size: 0.5rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1;
+}
+
+.flavor-compass__option:hover,
+.flavor-compass__option:focus-visible,
+.flavor-compass__option.is-active {
+  color: var(--option-accent);
+  outline: 0;
+  transform: translate(-50%, -50%) scale(1.07);
+}
+
+.flavor-compass__option:hover .flavor-compass__option-dot,
+.flavor-compass__option:focus-visible .flavor-compass__option-dot,
+.flavor-compass__option.is-active .flavor-compass__option-dot {
+  background: var(--option-accent);
+  box-shadow: 0 0 0 8px color-mix(in srgb, var(--option-accent) 17%, transparent);
+}
+
+.flavor-compass__caption {
+  position: absolute;
+  right: 2%;
+  bottom: 1%;
+  z-index: 3;
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  color: rgba(242, 231, 213, 0.45);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.17em;
+  text-align: right;
+  will-change: transform, opacity;
+}
+
+.flavor-compass__caption strong {
+  color: var(--flavor-accent);
+  font-family: var(--font-mouse-memoirs), "Arial Narrow", sans-serif;
+  font-size: clamp(1.55rem, 2.5vw, 2.1rem);
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  line-height: 1;
+  transition: color 420ms ease;
+}
+
 .home-button {
   display: inline-flex;
   min-height: 48px;
@@ -2718,6 +3021,75 @@ body:has(.home-page) .bg-surface {
     width: 30px;
     height: 1px;
     background: linear-gradient(90deg, var(--home-accent), transparent);
+  }
+
+  .flavor-compass {
+    min-height: auto;
+    padding: 92px 0 100px;
+  }
+
+  .flavor-compass__wash {
+    top: 24%;
+    width: 94vw;
+  }
+
+  .flavor-compass__intro {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .flavor-compass__intro h2 {
+    max-width: 10ch;
+    font-size: clamp(3.35rem, 16vw, 5.2rem);
+  }
+
+  .flavor-compass__signal {
+    width: min(100%, 280px);
+    justify-self: end;
+  }
+
+  .flavor-compass__stage {
+    min-height: 820px;
+    margin-top: 4px;
+  }
+
+  .flavor-compass__track {
+    top: 30%;
+    width: 108vw;
+  }
+
+  .flavor-compass__glass {
+    top: 26%;
+    width: min(72vw, 360px);
+  }
+
+  .flavor-compass__options {
+    top: 51%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-content: start;
+    gap: 10px 22px;
+    height: auto;
+  }
+
+  .flavor-compass__option {
+    position: relative;
+    top: auto;
+    left: auto;
+    min-width: 0;
+    width: 100%;
+    transform: none;
+  }
+
+  .flavor-compass__option:hover,
+  .flavor-compass__option:focus-visible,
+  .flavor-compass__option.is-active {
+    transform: translateX(4px) scale(1.02);
+  }
+
+  .flavor-compass__caption {
+    right: 0;
+    bottom: 2%;
   }
 
   .home-featured__heading {
