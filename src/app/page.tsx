@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { featuredRecipes } from "@/lib/mock-data";
 import { HomeHero } from "@/components/home-hero";
+import { FlavorCompass } from "@/components/flavor-compass";
 
 const journeys = [
   {
@@ -32,6 +33,7 @@ export default function HomePage() {
   return (
     <main className="home-page">
       <HomeHero />
+      <FlavorCompass />
 
       <section className="home-intro page-shell" aria-labelledby="home-intro-title">
         <div className="home-intro__statement">
