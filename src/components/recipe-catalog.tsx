@@ -10,6 +10,7 @@ import { Flip } from "gsap/Flip";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useReducedMotion } from "motion/react";
 import type { RecipeCard, RecipeTag } from "@/lib/recipes";
+import { moodFilterRules, type MoodFilter, type MoodFilterRule } from "@/lib/taste-filters";
 import { useRecipeTransition } from "@/components/recipe-transition-provider";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger, Flip);
@@ -20,23 +21,10 @@ type RecipeCatalogProps = {
   selectedSpirit: string;
 };
 
-const moodFilterRules = [
-  { label: "全部", slugs: [], labels: [] },
-  { label: "清爽", slugs: ["refreshing", "mint", "sparkling"], labels: ["清爽", "薄荷", "气泡"] },
-  { label: "酸爽", slugs: ["sour", "acidic", "citrus"], labels: ["酸爽", "柑橘"] },
-  { label: "苦甜", slugs: ["bitter", "bittersweet"], labels: ["苦甜", "苦感"] },
-  { label: "草本", slugs: ["herbal", "mint"], labels: ["草本", "薄荷"] },
-  { label: "果香", slugs: ["fruit", "berry", "apple", "pineapple", "peach", "grapefruit"], labels: ["果香", "莓", "苹果", "菠萝", "桃", "葡萄柚"] },
-  { label: "香料", slugs: ["spice", "spiced", "aromatic", "vanilla", "oak"], labels: ["香料", "辛香", "香草", "橡木"] },
-  { label: "酒感", slugs: ["spirit-forward"], labels: ["酒感", "酒体前置"] }
-] as const;
-
 const baseSpiritFilters = ["全部", "金酒", "朗姆", "龙舌兰", "伏特加", "威士忌", "白兰地"] as const;
 const pageSize = 24;
 
-type MoodFilter = (typeof moodFilterRules)[number]["label"];
 type SpiritFilter = (typeof baseSpiritFilters)[number];
-type MoodFilterRule = (typeof moodFilterRules)[number];
 
 const spiritStages: Array<{
   category: string;
