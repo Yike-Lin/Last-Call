@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { featuredRecipes } from "@/lib/mock-data";
+import { HomeHero } from "@/components/home-hero";
 
 const journeys = [
   {
@@ -30,26 +31,7 @@ export default function HomePage() {
 
   return (
     <main className="home-page">
-      <section className="home-hero">
-        <div className="home-hero__inner">
-          <div className="home-hero__copy">
-            <h1>Last Call</h1>
-            <p className="home-hero__lede">
-              这一杯，算你会喝
-            </p>
-            <div className="home-actions">
-              <Link className="home-button home-button--primary" href="/recipes">
-                开始选酒
-                <span aria-hidden="true">→</span>
-              </Link>
-              <Link className="home-button home-button--secondary" href="/cabinet">
-                查看我的酒柜
-              </Link>
-            </div>
-          </div>
-
-        </div>
-      </section>
+      <HomeHero />
 
       <section className="home-intro page-shell" aria-labelledby="home-intro-title">
         <div className="home-intro__statement">
