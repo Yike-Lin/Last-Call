@@ -21,6 +21,7 @@ const heroLayers = [
 export function HomeHero() {
   const rootRef = useRef<HTMLElement>(null);
   const copyRef = useRef<HTMLDivElement>(null);
+  const backgroundRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<HTMLDivElement>(null);
   const objectRef = useRef<HTMLDivElement>(null);
   const sparkRef = useRef<HTMLImageElement>(null);
@@ -28,65 +29,34 @@ export function HomeHero() {
   useGSAP((_, contextSafe) => {
     const root = rootRef.current;
     const copy = copyRef.current;
-    const scene = sceneRef.current;
-    const object = objectRef.current;
-    const spark = sparkRef.current;
+    const background = backgroundRef.current;
 
-    if (!root || !copy || !scene || !object || !spark) {
+    if (!root || !copy || !background) {
       return;
     }
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     if (reduceMotion) {
-      gsap.set([copy, scene, spark], { autoAlpha: 1, clearProps: "transform" });
+      gsap.set([copy, background], { autoAlpha: 1, clearProps: "transform" });
       return;
     }
 
     const intro = gsap.timeline({ defaults: { ease: "power3.out" } });
 
     gsap.set(copy, { autoAlpha: 0, y: 24 });
-    gsap.set(scene, { autoAlpha: 0, y: 28, scale: 0.96 });
-    gsap.set(spark, { autoAlpha: 0, scale: 0.2, rotation: -18, transformOrigin: "50% 50%" });
+    gsap.set(background, { autoAlpha: 0, scale: 1.04 });
 
     intro
-      .to(scene, { autoAlpha: 1, y: 0, scale: 1, duration: 1.15 }, 0.14)
-      .to(copy, { autoAlpha: 1, y: 0, duration: 0.85 }, 0.5)
-      .to(spark, { autoAlpha: 1, scale: 1, rotation: 0, duration: 0.68, ease: "back.out(1.8)" }, 1.05);
+      .to(background, { autoAlpha: 1, scale: 1, duration: 1.2 }, 0.1)
+      .to(copy, { autoAlpha: 1, y: 0, duration: 0.85 }, 0.45);
 
-    gsap.to(object, {
-      y: -9,
-      rotationZ: 0.45,
-      duration: 4.2,
-      ease: "sine.inOut",
-      repeat: -1,
-      yoyo: true,
-      delay: 1.1
-    });
-
-    gsap.to(spark, {
-      rotation: 12,
-      duration: 5.5,
-      ease: "sine.inOut",
-      repeat: -1,
-      yoyo: true,
-      delay: 1.2
-    });
-
-    const sceneXTo = gsap.quickTo(scene, "x", {
+    const backgroundXTo = gsap.quickTo(background, "x", {
       duration: 0.8,
       ease: "power3.out"
     });
-    const sceneYTo = gsap.quickTo(scene, "y", {
+    const backgroundYTo = gsap.quickTo(background, "y", {
       duration: 0.8,
-      ease: "power3.out"
-    });
-    const objectRotationYTo = gsap.quickTo(object, "rotationY", {
-      duration: 0.9,
-      ease: "power3.out"
-    });
-    const objectRotationXTo = gsap.quickTo(object, "rotationX", {
-      duration: 0.9,
       ease: "power3.out"
     });
 
@@ -99,17 +69,13 @@ export function HomeHero() {
       const normalizedX = (event.clientX - bounds.left) / bounds.width - 0.5;
       const normalizedY = (event.clientY - bounds.top) / bounds.height - 0.5;
 
-      sceneXTo(normalizedX * 18);
-      sceneYTo(normalizedY * 10);
-      objectRotationYTo(normalizedX * 4);
-      objectRotationXTo(normalizedY * -2.5);
+      backgroundXTo(normalizedX * 10);
+      backgroundYTo(normalizedY * 6);
     };
 
     const resetPointerMotion = () => {
-      sceneXTo(0);
-      sceneYTo(0);
-      objectRotationYTo(0);
-      objectRotationXTo(0);
+      backgroundXTo(0);
+      backgroundYTo(0);
     };
 
     const handlePointerMove = contextSafe ? contextSafe(movePointer) : movePointer;
@@ -126,9 +92,18 @@ export function HomeHero() {
 
   return (
     <section className="home-hero" ref={rootRef} aria-labelledby="home-hero-title">
+      <div className="home-hero__background" ref={backgroundRef} aria-hidden="true">
+        <Image
+          className="home-hero__background-image"
+          src="/images/last-call-liquid-tools-hero-4k-clean.png"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+        />
+      </div>
+
       <div className="home-hero__atmosphere" aria-hidden="true">
-        <span className="home-hero__light home-hero__light--left" />
-        <span className="home-hero__light home-hero__light--right" />
         <span className="home-hero__grain" />
       </div>
 

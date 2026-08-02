@@ -1932,24 +1932,34 @@ body:has(.home-page) .bg-surface {
   display: flex;
   min-height: 100dvh;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 74% 46%, rgba(217, 138, 50, 0.16), transparent 26%),
-    radial-gradient(circle at 12% 22%, rgba(242, 231, 213, 0.06), transparent 20%),
-    linear-gradient(115deg, #0b0a08 0%, #160d08 51%, #0b0a08 100%);
+  background: #0b0a08;
   min-height: 100dvh;
   color: var(--home-text);
 }
 
 .home-hero::before {
   position: absolute;
-  inset: auto 0 0;
-  height: 46%;
+  inset: 0;
   background:
-    linear-gradient(90deg, rgba(11, 10, 8, 0.92), transparent 36%, rgba(11, 10, 8, 0.76)),
-    linear-gradient(180deg, transparent, rgba(11, 10, 8, 0.82));
+    linear-gradient(90deg, rgba(11, 10, 8, 0.28), rgba(11, 10, 8, 0.06) 44%, rgba(11, 10, 8, 0.3)),
+    linear-gradient(180deg, rgba(11, 10, 8, 0.08), rgba(11, 10, 8, 0.36));
   content: "";
   pointer-events: none;
   z-index: 1;
+}
+
+.home-hero__background {
+  position: absolute;
+  z-index: 0;
+  inset: -2%;
+  overflow: hidden;
+  will-change: transform, opacity;
+}
+
+.home-hero__background-image {
+  object-fit: cover;
+  object-position: center center;
+  user-select: none;
 }
 
 .home-hero__atmosphere,
@@ -2093,7 +2103,7 @@ body:has(.home-page) .bg-surface {
 
 .home-hero__scene {
   position: relative;
-  display: grid;
+  display: none;
   min-height: min(78vh, 720px);
   place-items: center;
   perspective: 1100px;
@@ -3565,6 +3575,16 @@ body:has(.home-page) .bg-surface {
 }
 
 @media (max-width: 767px) {
+  .home-hero::before {
+    background:
+      linear-gradient(180deg, rgba(11, 10, 8, 0.16), rgba(11, 10, 8, 0.78) 72%),
+      linear-gradient(90deg, rgba(11, 10, 8, 0.16), transparent 55%, rgba(11, 10, 8, 0.42));
+  }
+
+  .home-hero__background-image {
+    object-position: 68% center;
+  }
+
   body:not(:has(.home-page)) main.page-shell {
     padding-top: 132px;
   }
