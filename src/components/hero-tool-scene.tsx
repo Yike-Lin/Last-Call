@@ -17,6 +17,8 @@ type ToolModel = {
   position: THREE.Vector3Tuple;
   rotation: THREE.Vector3Tuple;
   scale: number;
+  spinAxis: THREE.Vector3Tuple;
+  spinPivot?: THREE.Vector3Tuple;
 };
 
 const toolModels: ToolModel[] = [
@@ -25,21 +27,25 @@ const toolModels: ToolModel[] = [
     url: "/models/jigger-stainless.glb",
     position: [-1.3, -1.2, -0.2],
     rotation: [0.18, -0.16, 0.22],
-    scale: 1.08
+    scale: 1.08,
+    spinAxis: [0, 1, 0]
   },
   {
     key: "shaker",
     url: "/models/shaker-stainless.glb",
     position: [0.22, -0.05, 0.14],
     rotation: [-0.22, 0.18, -0.16],
-    scale: 2.04
+    scale: 2.04,
+    spinAxis: [0, 1, 0]
   },
   {
     key: "strainer",
     url: "/models/hawthorne-strainer-stainless.glb",
-    position: [1.62, -0.52, -0.62],
+    position: [1.84, -0.52, -0.62],
     rotation: [0.12, 0.18, Math.PI / 2],
-    scale: 1.08
+    scale: 1.08,
+    spinAxis: [0.945, 0, -0.328],
+    spinPivot: [0.265, 0.015, -0.136]
   }
 ];
 
@@ -112,7 +118,16 @@ export function HeroToolScene() {
     let disposed = false;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const pointer = new THREE.Vector2(0, 0);
-    const drag = { active: false, x: 0, targetYaw: 0, yaw: 0 };
+    const drag = {
+      active: false,
+      x: 0,
+      tool: null as THREE.Object3D | null,
+      targetAngle: 0,
+      angle: 0,
+      groupRotationY: 0
+    };
+    const raycaster = new THREE.Raycaster();
+    const spinQuaternion = new THREE.Quaternion();
     const clock = new THREE.Clock();
     const scene = new THREE.Scene();
     const group = new THREE.Group();
@@ -255,7 +270,13 @@ export function HeroToolScene() {
         // Keep the normalization scale from frameModel, then apply the display multiplier.
         object.scale.multiplyScalar(model.scale * 2);
         object.name = `hero-${model.key}`;
-        object.userData.baseY = model.position[1];
+        object.userData.basePosition = new THREE.Vector3(...model.position);
+        object.userData.baseQuaternion = object.quaternion.clone();
+        object.userData.spinAxis = new THREE.Vector3(...model.spinAxis).normalize();
+        if (model.spinPivot) {
+          object.userData.spinPivot = new THREE.Vector3(...model.spinPivot);
+        }
+        object.userData.dragAngle = 0;
 
         if (model.key === "shaker") {
           shakerGroup.add(object);
@@ -292,31 +313,119 @@ export function HeroToolScene() {
       camera.aspect = width / Math.max(height, 1);
       camera.updateProjectionMatrix();
 
-      const small = width < 720;
+      // The desktop canvas intentionally extends 96px to the right so the
+      // strainer can rotate without being clipped. Keep the original model
+      // scale breakpoint based on the pre-extension width; otherwise a
+      // slightly wider canvas can cross 720px and make every tool jump to the
+      // larger desktop framing.
+      const canvasExtension = window.matchMedia("(min-width: 768px)").matches ? 96 : 0;
+      const small = width - canvasExtension < 720;
       camera.position.z = small ? 7.6 : 6.4;
       group.position.set(small ? 0.28 : 0.08, small ? -0.12 : 0.02, 0);
       group.scale.setScalar(small ? 0.76 : 1);
     };
 
-    const onPointerMove = (event: PointerEvent) => {
+    const updatePointer = (event: PointerEvent) => {
       const bounds = mount.getBoundingClientRect();
       pointer.x = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2;
       pointer.y = ((event.clientY - bounds.top) / bounds.height - 0.5) * 2;
+    };
 
-      if (drag.active) {
-        drag.targetYaw += (event.clientX - drag.x) * 0.004;
+    const onPointerMove = (event: PointerEvent) => {
+      if (drag.active && drag.tool) {
+        drag.targetAngle += (event.clientX - drag.x) * 0.008;
         drag.x = event.clientX;
       }
     };
 
     const onPointerDown = (event: PointerEvent) => {
+      if (event.button !== 0) {
+        return;
+      }
+
+      updatePointer(event);
+      group.updateMatrixWorld(true);
+      camera.updateMatrixWorld(true);
+      raycaster.setFromCamera(pointer, camera);
+      const hit = raycaster.intersectObjects(loadedObjects, true)[0];
+      let tool: THREE.Object3D | null = hit?.object ?? null;
+
+      while (tool && !loadedObjects.includes(tool)) {
+        tool = tool.parent;
+      }
+
+      // Some hollow or double-walled assets can render correctly but expose
+      // no front-facing triangle at the exact cursor point. Use their
+      // projected bounds as a forgiving fallback so visible tools remain
+      // draggable without changing the actual model geometry.
+      if (!tool) {
+        const bounds = mount.getBoundingClientRect();
+        let fallback: THREE.Object3D | null = null;
+        let fallbackScore = Number.POSITIVE_INFINITY;
+
+        loadedObjects.forEach((object) => {
+          const box = new THREE.Box3().setFromObject(object);
+          if (box.isEmpty()) {
+            return;
+          }
+
+          const corners = [
+            new THREE.Vector3(box.min.x, box.min.y, box.min.z),
+            new THREE.Vector3(box.min.x, box.min.y, box.max.z),
+            new THREE.Vector3(box.min.x, box.max.y, box.min.z),
+            new THREE.Vector3(box.min.x, box.max.y, box.max.z),
+            new THREE.Vector3(box.max.x, box.min.y, box.min.z),
+            new THREE.Vector3(box.max.x, box.min.y, box.max.z),
+            new THREE.Vector3(box.max.x, box.max.y, box.min.z),
+            new THREE.Vector3(box.max.x, box.max.y, box.max.z)
+          ];
+          const screen = corners.map((corner) => {
+            const projected = corner.project(camera);
+            return {
+              x: bounds.left + ((projected.x + 1) / 2) * bounds.width,
+              y: bounds.top + ((1 - projected.y) / 2) * bounds.height
+            };
+          });
+          const minX = Math.min(...screen.map((point) => point.x));
+          const maxX = Math.max(...screen.map((point) => point.x));
+          const minY = Math.min(...screen.map((point) => point.y));
+          const maxY = Math.max(...screen.map((point) => point.y));
+
+          if (event.clientX < minX || event.clientX > maxX || event.clientY < minY || event.clientY > maxY) {
+            return;
+          }
+
+          const center = box.getCenter(new THREE.Vector3()).project(camera);
+          const centerX = bounds.left + ((center.x + 1) / 2) * bounds.width;
+          const centerY = bounds.top + ((1 - center.y) / 2) * bounds.height;
+          const score = Math.hypot(event.clientX - centerX, event.clientY - centerY);
+          if (score < fallbackScore) {
+            fallback = object;
+            fallbackScore = score;
+          }
+        });
+
+        tool = fallback;
+      }
+
+      if (!tool) {
+        return;
+      }
+
+      const selectedTool = tool as THREE.Object3D;
+
       drag.active = true;
       drag.x = event.clientX;
+      drag.tool = selectedTool;
+      drag.targetAngle = typeof selectedTool.userData.dragAngle === "number" ? selectedTool.userData.dragAngle : 0;
+      drag.angle = drag.targetAngle;
+      drag.groupRotationY = group.rotation.y;
       mount.setPointerCapture(event.pointerId);
     };
 
     const onPointerUp = (event: PointerEvent) => {
       drag.active = false;
+      drag.tool = null;
       if (mount.hasPointerCapture(event.pointerId)) {
         mount.releasePointerCapture(event.pointerId);
       }
@@ -333,15 +442,45 @@ export function HeroToolScene() {
 
     const animate = () => {
       const elapsed = clock.getElapsedTime();
-      drag.yaw += (drag.targetYaw - drag.yaw) * 0.075;
+      if (drag.active) {
+        // Freeze the shared ambient turn while dragging so only the selected
+        // tool responds to horizontal movement.
+        group.rotation.y = drag.groupRotationY;
+      } else {
+        group.rotation.y = reduceMotion ? 0 : Math.sin(elapsed * 0.22) * 0.02;
+      }
 
-      group.rotation.y = drag.yaw + pointer.x * 0.045 + (reduceMotion ? 0 : Math.sin(elapsed * 0.22) * 0.02);
-      group.rotation.x = -pointer.y * 0.025;
-      group.position.y += ((pointer.y * -0.04) - group.position.y) * 0.02;
+      if (drag.tool) {
+        drag.angle += (drag.targetAngle - drag.angle) * 0.16;
+        const baseQuaternion = drag.tool.userData.baseQuaternion as THREE.Quaternion | undefined;
+        const spinAxis = drag.tool.userData.spinAxis as THREE.Vector3 | undefined;
+
+        if (baseQuaternion && spinAxis) {
+          spinQuaternion.setFromAxisAngle(spinAxis, drag.angle);
+          drag.tool.quaternion.copy(baseQuaternion).multiply(spinQuaternion);
+          drag.tool.userData.dragAngle = drag.angle;
+        }
+      }
 
       loadedObjects.forEach((object, index) => {
-        const baseY = typeof object.userData.baseY === "number" ? object.userData.baseY : object.position.y;
-        object.position.y = baseY + Math.sin(elapsed * 0.58 + index * 1.8) * 0.018 * (reduceMotion ? 0 : 1);
+        const basePosition = object.userData.basePosition as THREE.Vector3 | undefined;
+        const baseQuaternion = object.userData.baseQuaternion as THREE.Quaternion | undefined;
+        const spinAxis = object.userData.spinAxis as THREE.Vector3 | undefined;
+        const spinPivot = object.userData.spinPivot as THREE.Vector3 | undefined;
+        const dragAngle = typeof object.userData.dragAngle === "number" ? object.userData.dragAngle : 0;
+
+        if (basePosition) {
+          object.position.copy(basePosition);
+        }
+
+        if (baseQuaternion && spinAxis && spinPivot && dragAngle !== 0) {
+          const pivotRotation = new THREE.Quaternion().setFromAxisAngle(spinAxis, dragAngle);
+          const rotatedPivot = spinPivot.clone().applyQuaternion(pivotRotation);
+          object.position.add(spinPivot.clone().sub(rotatedPivot).applyQuaternion(baseQuaternion));
+        }
+
+        object.position.y +=
+          Math.sin(elapsed * 0.58 + index * 1.8) * 0.018 * (reduceMotion ? 0 : 1);
       });
 
       shakerParts.forEach((part, index) => {

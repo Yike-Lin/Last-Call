@@ -2199,6 +2199,12 @@ body:has(.home-page) .bg-surface {
   transition: opacity 280ms ease;
 }
 
+@media (min-width: 768px) {
+  .home-hero__scene {
+    margin-right: -96px;
+  }
+}
+
 .home-hero__object {
   position: relative;
   width: min(100%, 600px);
