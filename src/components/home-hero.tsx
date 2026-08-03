@@ -1,30 +1,17 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
+import { HeroToolScene } from "@/components/hero-tool-scene";
 
 gsap.registerPlugin(useGSAP);
-
-const heroLayers = [
-  { src: "/svg/hero-glass-shadow.svg", className: "home-hero__layer--shadow" },
-  { src: "/svg/hero-glass-liquid.svg", className: "home-hero__layer--liquid" },
-  { src: "/svg/hero-ice.svg", className: "home-hero__layer--ice" },
-  { src: "/svg/hero-splash.svg", className: "home-hero__layer--splash" },
-  { src: "/svg/hero-bubbles.svg", className: "home-hero__layer--bubbles" },
-  { src: "/svg/hero-glass-outline.svg", className: "home-hero__layer--outline" },
-  { src: "/svg/hero-garnish.svg", className: "home-hero__layer--garnish" }
-] as const;
 
 export function HomeHero() {
   const rootRef = useRef<HTMLElement>(null);
   const copyRef = useRef<HTMLDivElement>(null);
   const backgroundRef = useRef<HTMLDivElement>(null);
-  const sceneRef = useRef<HTMLDivElement>(null);
-  const objectRef = useRef<HTMLDivElement>(null);
-  const sparkRef = useRef<HTMLImageElement>(null);
 
   useGSAP((_, contextSafe) => {
     const root = rootRef.current;
@@ -93,14 +80,8 @@ export function HomeHero() {
   return (
     <section className="home-hero" ref={rootRef} aria-labelledby="home-hero-title">
       <div className="home-hero__background" ref={backgroundRef} aria-hidden="true">
-        <Image
-          className="home-hero__background-image"
-          src="/images/last-call-liquid-tools-hero-4k-clean.png"
-          alt=""
-          fill
-          priority
-          sizes="100vw"
-        />
+        <span className="home-hero__background-glow home-hero__background-glow--warm" />
+        <span className="home-hero__background-glow home-hero__background-glow--cool" />
       </div>
 
       <div className="home-hero__atmosphere" aria-hidden="true">
@@ -124,48 +105,15 @@ export function HomeHero() {
               查看我的酒柜
             </Link>
           </div>
-          <div className="home-hero__meta" aria-hidden="true">
-            <span>23:47 /</span>
-            <span>YOUR EVENING STARTS NOW</span>
-          </div>
         </div>
 
-        <div className="home-hero__scene" ref={sceneRef} aria-hidden="true">
+        <div className="home-hero__scene" aria-hidden="true">
           <div className="home-hero__scene-grid" />
           <div className="home-hero__halo" />
-          <div className="home-hero__object" ref={objectRef}>
-            {heroLayers.map((layer) => (
-              <Image
-                key={layer.src}
-                className={`home-hero__layer ${layer.className}`}
-                src={layer.src}
-                alt=""
-                fill
-                sizes="(max-width: 767px) 88vw, 47vw"
-                priority={layer.className === "home-hero__layer--outline"}
-              />
-            ))}
-            <Image
-              ref={sparkRef}
-              className="home-hero__spark"
-              src="/svg/hero-spark.svg"
-              alt=""
-              width={116}
-              height={116}
-            />
-          </div>
-          <div className="home-hero__caption">
-            <span>01 / HOUSE POUR</span>
-            <strong>Old Fashioned</strong>
-            <small>BOURBON · ORANGE · BITTERS</small>
-          </div>
+          <HeroToolScene />
         </div>
       </div>
 
-      <div className="home-hero__scroll" aria-hidden="true">
-        <span>SCROLL TO FIND YOUR POUR</span>
-        <i />
-      </div>
     </section>
   );
 }
