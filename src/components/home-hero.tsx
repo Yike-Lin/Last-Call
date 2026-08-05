@@ -80,8 +80,6 @@ export function HomeHero() {
   return (
     <section className="home-hero" ref={rootRef} aria-labelledby="home-hero-title">
       <div className="home-hero__background" ref={backgroundRef} aria-hidden="true">
-        <span className="home-hero__background-glow home-hero__background-glow--warm" />
-        <span className="home-hero__background-glow home-hero__background-glow--cool" />
       </div>
 
       <div className="home-hero__atmosphere" aria-hidden="true">
@@ -109,7 +107,6 @@ export function HomeHero() {
 
         <div className="home-hero__scene" aria-hidden="true">
           <div className="home-hero__scene-grid" />
-          <div className="home-hero__halo" />
           <HeroToolScene />
         </div>
       </div>
