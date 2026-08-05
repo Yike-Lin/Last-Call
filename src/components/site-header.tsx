@@ -38,10 +38,11 @@ export function SiteHeader() {
   return (
     <header className={`site-header-shell${isHidden ? " site-header-shell--hidden" : ""}`}>
       <div className="site-header-inner">
-        <Link href="/" className="site-header-brand" aria-label="返回首页">
+        <Link href="/" className="site-header-brand" aria-label="Last Call，返回首页">
           <svg className="site-header-logo" viewBox="0 0 128 128" aria-hidden="true" focusable="false">
             <use href="/svg/last-call-logo.svg#last-call-logo-mark" />
           </svg>
+          <span className="site-header-brand__wordmark">Last Call</span>
         </Link>
 
         <nav className="site-header-nav" aria-label="主导航">
