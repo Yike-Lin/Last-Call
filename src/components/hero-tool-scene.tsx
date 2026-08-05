@@ -24,8 +24,8 @@ type ToolModel = {
 const toolModels: ToolModel[] = [
   {
     key: "jigger",
-    url: "/models/jigger-stainless.glb",
-    position: [-1.3, -1.2, -0.2],
+    url: "/models/jigger-stainless-web.glb",
+    position: [-1.3, -0.85, -0.2],
     rotation: [0.18, -0.16, 0.22],
     scale: 1.08,
     spinAxis: [0, 1, 0]
@@ -33,7 +33,7 @@ const toolModels: ToolModel[] = [
   {
     key: "shaker",
     url: "/models/shaker-stainless.glb",
-    position: [0.22, -0.05, 0.14],
+    position: [0.22, 0.3, 0.14],
     rotation: [-0.22, 0.18, -0.16],
     scale: 2.04,
     spinAxis: [0, 1, 0]
@@ -41,7 +41,7 @@ const toolModels: ToolModel[] = [
   {
     key: "strainer",
     url: "/models/hawthorne-strainer-stainless.glb",
-    position: [1.84, -0.52, -0.62],
+    position: [1.84, -0.17, -0.62],
     rotation: [0.12, 0.18, Math.PI / 2],
     scale: 1.08,
     spinAxis: [0.945, 0, -0.328],
@@ -134,7 +134,6 @@ export function HeroToolScene() {
     const shakerGroup = new THREE.Group();
     const loadedObjects: THREE.Object3D[] = [];
     const shakerParts: THREE.Object3D[] = [];
-    const loadingLabel = mount.querySelector<HTMLElement>(".home-hero__tool-loading");
 
     scene.fog = new THREE.FogExp2(0x070604, 0.035);
     scene.add(group);
@@ -256,8 +255,9 @@ export function HeroToolScene() {
     scene.add(shadowPlane);
 
     const loader = new GLTFLoader();
+
     toolModels.forEach((model) => {
-      loader.load(model.url, (gltf) => {
+      const handleLoadedModel = (gltf: { scene: THREE.Object3D }) => {
         if (disposed) {
           return;
         }
@@ -291,11 +291,43 @@ export function HeroToolScene() {
         }
 
         loadedObjects.push(object);
-        if (loadingLabel) {
-          loadingLabel.style.opacity = "0";
-        }
+      };
+
+      loader.load(model.url, handleLoadedModel, undefined, (error) => {
+        console.error(`Failed to load ${model.key} model`, error);
       });
     });
+
+    const applyToolPose = (object: THREE.Object3D, angle: number) => {
+      const basePosition = object.userData.basePosition as THREE.Vector3 | undefined;
+      const baseQuaternion = object.userData.baseQuaternion as THREE.Quaternion | undefined;
+      const spinAxis = object.userData.spinAxis as THREE.Vector3 | undefined;
+      const spinPivot = object.userData.spinPivot as THREE.Vector3 | undefined;
+
+      if (baseQuaternion && spinAxis) {
+        spinQuaternion.setFromAxisAngle(spinAxis, angle);
+        object.quaternion.copy(baseQuaternion).multiply(spinQuaternion);
+      }
+
+      if (basePosition) {
+        object.position.copy(basePosition);
+      }
+
+      if (baseQuaternion && spinAxis && spinPivot && angle !== 0) {
+        const pivotRotation = new THREE.Quaternion().setFromAxisAngle(spinAxis, angle);
+        const rotatedPivot = spinPivot.clone().applyQuaternion(pivotRotation);
+        object.position.add(spinPivot.clone().sub(rotatedPivot).applyQuaternion(baseQuaternion));
+      }
+    };
+
+    const updateToolPositions = (elapsed: number) => {
+      loadedObjects.forEach((object, index) => {
+        const dragAngle = typeof object.userData.dragAngle === "number" ? object.userData.dragAngle : 0;
+        applyToolPose(object, dragAngle);
+        object.position.y +=
+          Math.sin(elapsed * 0.58 + index * 1.8) * 0.018 * (reduceMotion ? 0 : 1);
+      });
+    };
 
     const resize = () => {
       const width = mount.clientWidth;
@@ -452,36 +484,15 @@ export function HeroToolScene() {
 
       if (drag.tool) {
         drag.angle += (drag.targetAngle - drag.angle) * 0.16;
-        const baseQuaternion = drag.tool.userData.baseQuaternion as THREE.Quaternion | undefined;
-        const spinAxis = drag.tool.userData.spinAxis as THREE.Vector3 | undefined;
-
-        if (baseQuaternion && spinAxis) {
-          spinQuaternion.setFromAxisAngle(spinAxis, drag.angle);
-          drag.tool.quaternion.copy(baseQuaternion).multiply(spinQuaternion);
-          drag.tool.userData.dragAngle = drag.angle;
-        }
+        drag.tool.userData.dragAngle = drag.angle;
       }
 
-      loadedObjects.forEach((object, index) => {
-        const basePosition = object.userData.basePosition as THREE.Vector3 | undefined;
-        const baseQuaternion = object.userData.baseQuaternion as THREE.Quaternion | undefined;
-        const spinAxis = object.userData.spinAxis as THREE.Vector3 | undefined;
-        const spinPivot = object.userData.spinPivot as THREE.Vector3 | undefined;
-        const dragAngle = typeof object.userData.dragAngle === "number" ? object.userData.dragAngle : 0;
-
-        if (basePosition) {
-          object.position.copy(basePosition);
-        }
-
-        if (baseQuaternion && spinAxis && spinPivot && dragAngle !== 0) {
-          const pivotRotation = new THREE.Quaternion().setFromAxisAngle(spinAxis, dragAngle);
-          const rotatedPivot = spinPivot.clone().applyQuaternion(pivotRotation);
-          object.position.add(spinPivot.clone().sub(rotatedPivot).applyQuaternion(baseQuaternion));
-        }
-
-        object.position.y +=
-          Math.sin(elapsed * 0.58 + index * 1.8) * 0.018 * (reduceMotion ? 0 : 1);
-      });
+      // All three tools rotate around their own anchored axis (the strainer
+      // also keeps its authored pivot), so the drag never translates one tool
+      // through another. Avoid broad AABB rollback here: it falsely treats
+      // the intentional layered composition as a collision and prevents full
+      // 360-degree rotations.
+      updateToolPositions(elapsed);
 
       shakerParts.forEach((part, index) => {
         const phase = elapsed * 0.72 + index * 0.7;
@@ -519,8 +530,6 @@ export function HeroToolScene() {
   }, []);
 
   return (
-    <div className="home-hero__tool-canvas" ref={mountRef} aria-hidden="true">
-      <span className="home-hero__tool-loading">LOADING BARWARE</span>
-    </div>
+    <div className="home-hero__tool-canvas" ref={mountRef} aria-hidden="true" />
   );
 }
