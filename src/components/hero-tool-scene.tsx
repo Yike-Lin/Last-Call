@@ -135,6 +135,87 @@ export function HeroToolScene() {
     const loadedObjects: THREE.Object3D[] = [];
     const shakerParts: THREE.Object3D[] = [];
 
+    // A restrained black-liquid surface sits behind the barware. It is kept
+    // deliberately low contrast: the movement comes from slowly shifting
+    // refraction bands rather than a bright water texture or a heavy fluid
+    // simulation, so the three draggable tools remain the visual focus.
+    const liquidMaterial = new THREE.ShaderMaterial({
+      uniforms: {
+        uTime: { value: 0 },
+        uResolution: { value: new THREE.Vector2(1, 1) }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform float uTime;
+        uniform vec2 uResolution;
+
+        varying vec2 vUv;
+
+        float liquidHeight(vec2 p, float time) {
+          float broad = sin(p.x * 2.15 + time * 0.34 + sin(p.y * 2.7 - time * 0.23) * 0.7);
+          broad += 0.55 * sin(p.y * 4.1 - time * 0.28 + p.x * 1.4);
+          broad += 0.3 * sin((p.x + p.y) * 8.5 + time * 0.46);
+          return broad * 0.5;
+        }
+
+        void main() {
+          float time = uTime;
+          float aspect = uResolution.x / max(uResolution.y, 1.0);
+          vec2 p = (vUv - 0.5) * vec2(max(aspect, 1.0), 1.0);
+
+          // Sample a tiny neighborhood to derive a soft, moving liquid normal.
+          // This gives the surface a refractive sheen without extra render
+          // targets or screen-space reflection passes.
+          float h = liquidHeight(p, time);
+          float eps = 0.012;
+          float hx = liquidHeight(p + vec2(eps, 0.0), time) - h;
+          float hy = liquidHeight(p + vec2(0.0, eps), time) - h;
+          vec3 normal = normalize(vec3(-hx * 2.2, -hy * 2.2, 1.0));
+
+          vec3 coolLight = normalize(vec3(-0.48, 0.34, 0.8));
+          vec3 warmLight = normalize(vec3(0.62, 0.14, 0.76));
+          float coolSheen = pow(max(dot(normal, coolLight), 0.0), 8.0);
+          float warmSheen = pow(max(dot(normal, warmLight), 0.0), 12.0);
+
+          // Thin bands read as refraction moving across black liquid. Keep
+          // them narrow and dim so they never become a ring, grid, or halo.
+          float refractBand = smoothstep(
+            0.74,
+            0.98,
+            0.5 + 0.5 * sin(p.x * 18.0 + p.y * 5.0 + sin(p.y * 6.0 + time * 0.6) * 1.2 + time * 0.48)
+          );
+          refractBand *= 0.14;
+
+          vec3 color = vec3(0.006, 0.007, 0.009);
+          color += vec3(0.08, 0.12, 0.15) * coolSheen * 0.2;
+          color += vec3(0.22, 0.095, 0.028) * warmSheen * 0.075;
+          color += vec3(0.12, 0.16, 0.18) * refractBand;
+
+          // A gentle edge fade keeps the plane integrated with the dark page
+          // background and avoids a visible rectangular card.
+          float edge = smoothstep(0.0, 0.16, min(min(vUv.x, 1.0 - vUv.x), min(vUv.y, 1.0 - vUv.y)));
+          float alpha = mix(0.0, 0.9, edge);
+          gl_FragColor = vec4(color, alpha);
+        }
+      `,
+      transparent: true,
+      depthWrite: false,
+      depthTest: true,
+      side: THREE.DoubleSide
+    });
+    const liquidPlane = new THREE.Mesh(new THREE.PlaneGeometry(7.4, 4.9), liquidMaterial);
+    liquidPlane.position.set(0.28, 0.12, -1.52);
+    liquidPlane.renderOrder = -10;
+    liquidPlane.frustumCulled = false;
+    scene.add(liquidPlane);
+
     scene.fog = new THREE.FogExp2(0x070604, 0.035);
     scene.add(group);
     group.add(shakerGroup);
@@ -338,6 +419,10 @@ export function HeroToolScene() {
       renderer.setSize(width, height, false);
       composer.setPixelRatio(pixelRatio);
       composer.setSize(width, height);
+      liquidMaterial.uniforms.uResolution.value.set(
+        Math.max(1, Math.floor(width * pixelRatio)),
+        Math.max(1, Math.floor(height * pixelRatio))
+      );
       gtaoPass.setSize(
         Math.max(1, Math.floor(width * pixelRatio * 0.6)),
         Math.max(1, Math.floor(height * pixelRatio * 0.6))
@@ -500,6 +585,8 @@ export function HeroToolScene() {
         part.position.z = baseZ + Math.sin(phase) * 0.0028 * (reduceMotion ? 0 : 1);
       });
 
+      liquidMaterial.uniforms.uTime.value = reduceMotion ? 0 : elapsed;
+
       composer.render();
       frameId = window.requestAnimationFrame(animate);
     };
@@ -519,6 +606,7 @@ export function HeroToolScene() {
       gtaoPass.dispose();
       composer.dispose();
       renderer.dispose();
+      liquidMaterial.dispose();
       renderer.domElement.remove();
 
       scene.traverse((child) => {
