@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { Modak, Mouse_Memoirs, ZCOOL_KuaiLe } from "next/font/google";
+import { Anton, Modak, Mouse_Memoirs, ZCOOL_KuaiLe } from "next/font/google";
 import { SiteHeader } from "@/components/site-header";
 import { RecipeTransitionProvider } from "@/components/recipe-transition-provider";
 import "./globals.css";
 
 const modak = Modak({
   variable: "--font-modak",
+  weight: "400",
+  subsets: ["latin"],
+  display: "swap"
+});
+
+const anton = Anton({
+  variable: "--font-anton",
   weight: "400",
   subsets: ["latin"],
   display: "swap"
@@ -38,7 +45,7 @@ type RootLayoutProps = Readonly<{
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="zh-CN">
-      <body className={`${modak.variable} ${mouseMemoirs.variable} ${zcoolKuaiLe.variable}`}>
+      <body className={`${anton.variable} ${modak.variable} ${mouseMemoirs.variable} ${zcoolKuaiLe.variable}`}>
         <RecipeTransitionProvider>
           <SiteHeader />
           {children}

@@ -53,9 +53,6 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <Link href="mailto:hello@lastcall.com" className="site-header-contact">
-          联系我们
-        </Link>
       </div>
     </header>
   );
