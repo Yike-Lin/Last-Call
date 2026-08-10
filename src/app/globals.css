@@ -4919,3 +4919,84 @@ body:has(.recipe-detail-page) .site-header-shell {
     animation: none;
   }
 }
+
+/* Keep both opening screens on one fixed paper surface so the texture stays continuous. */
+.home-hero,
+.flavor-compass--empty {
+  background-color: #efe1c8;
+  background-image: url("/images/%E9%A6%96%E9%A1%B5%E7%89%9B%E7%9A%AE%E8%83%8C%E6%99%AF.png");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.flavor-compass--empty {
+  min-height: 100dvh;
+  height: 100dvh;
+  padding: 0;
+}
+
+.flavor-compass--empty::before,
+.flavor-compass--empty::after {
+  display: none;
+}
+
+/* Extend the same paper surface through the remaining home screens. */
+.featured-cocktails,
+.craft-section,
+.home-final-cta {
+  background-color: #efe1c8;
+  background-image: url("/images/%E9%A6%96%E9%A1%B5%E7%89%9B%E7%9A%AE%E8%83%8C%E6%99%AF.png");
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.featured-cocktails {
+  --home-text: #0b0b09;
+  color: #0b0b09;
+}
+
+.featured-cocktails__lede,
+.featured-cocktails__aside > span,
+.featured-cocktails__footer {
+  color: rgba(11, 10, 8, 0.64);
+}
+
+.featured-cocktail__link {
+  --home-text: #f2e7d5;
+}
+
+.featured-cocktail__link:hover,
+.featured-cocktail__link:focus-visible {
+  --home-text: #f2e7d5;
+}
+
+.featured-cocktails__control {
+  color: #f2e7d5;
+}
+
+.home-final-cta {
+  --home-text: #0b0b09;
+  color: #0b0b09;
+}
+
+.home-final-cta__copy p {
+  color: rgba(11, 10, 8, 0.72);
+}
+
+/* Empty placeholder screens keep their full-viewport rhythm without leaving any content behind. */
+.featured-cocktails--empty,
+.craft-section--empty,
+.home-final-cta--empty {
+  min-height: 100dvh;
+  height: 100dvh;
+  padding: 0;
+  border: 0;
+}
+
+.craft-section--empty::before {
+  display: none;
+}
