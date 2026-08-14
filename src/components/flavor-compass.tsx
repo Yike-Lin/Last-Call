@@ -1,14 +1,10 @@
 import Image from "next/image";
-import { CocktailLayerStage } from "@/components/cocktail-layer-stage";
-import { cocktailSlots } from "@/lib/cocktail-specimens";
 
 export function FlavorCompass() {
-  const activeCocktail = cocktailSlots[0];
-
   return (
     <section
       className="flavor-compass flavor-compass--cocktail"
-      aria-label="The Last Seven cocktail corridor"
+      aria-label="Paper field"
     >
       <Image
         className="home-poster__ruler"
@@ -27,7 +23,6 @@ export function FlavorCompass() {
       </div>
 
       <div className="flavor-compass__shell">
-        <CocktailLayerStage cocktail={activeCocktail} />
       </div>
     </section>
   );
