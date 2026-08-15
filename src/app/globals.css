@@ -805,6 +805,7 @@ body:not(:has(.home-page)) main.page-shell {
   line-height: 1.6;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 
 .recipe-index-row__meta {
@@ -1904,11 +1905,13 @@ body:has(.home-page) .bg-surface {
   box-sizing: border-box;
   width: min(100%, 1920px);
   min-height: 100dvh;
+  height: 100dvh;
   margin: 0 auto;
   padding: 90px clamp(28px, 8vw, 124px) 46px;
 }
 
 .home-poster__guides {
+  --home-guide-inset: 91px;
   position: absolute;
   z-index: 0;
   inset: 0;
@@ -1932,11 +1935,11 @@ body:has(.home-page) .bg-surface {
 }
 
 .home-poster__guide--top {
-  top: 91px;
+  top: var(--home-guide-inset);
 }
 
 .home-poster__guide--bottom {
-  bottom: 8%;
+  bottom: var(--home-guide-inset);
 }
 
 .home-poster__guide--left,
@@ -2097,7 +2100,11 @@ body:has(.home-page) .bg-surface {
   }
 
   .home-poster__guide--top {
-    top: 123px;
+    top: var(--home-guide-inset);
+  }
+
+  .home-poster__guides {
+    --home-guide-inset: 123px;
   }
 
   .home-poster__guide--left {
@@ -5015,9 +5022,31 @@ body:has(.recipe-detail-page) .site-header-shell {
   padding-top: clamp(112px, 13vh, 156px);
 }
 
+.flavor-compass__photo-frame {
+  position: absolute;
+  z-index: 0;
+  top: 15%;
+  left: 39%;
+  display: block;
+  width: min(64vw, 780px);
+  height: auto;
+  max-width: none;
+  pointer-events: none;
+  user-select: none;
+  transform: rotate(1.25deg);
+  transform-origin: 50% 50%;
+}
+
 @media (max-width: 760px) {
   .flavor-compass--cocktail .flavor-compass__shell {
     width: min(100%, calc(100vw - 36px));
     padding-top: 94px;
+  }
+
+  .flavor-compass__photo-frame {
+    top: 18%;
+    left: 4%;
+    width: 92vw;
+    transform: rotate(0.9deg);
   }
 }

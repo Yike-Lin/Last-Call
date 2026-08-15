@@ -23,6 +23,16 @@ export function FlavorCompass() {
       </div>
 
       <div className="flavor-compass__shell">
+        <Image
+          className="flavor-compass__photo-frame"
+          src="/images/%E7%AC%AC%E4%BA%8C%E5%B1%8F/%E7%9B%B8%E6%A1%86.jpg"
+          alt=""
+          width={1487}
+          height={1058}
+          sizes="(max-width: 760px) 92vw, 64vw"
+          unoptimized
+          aria-hidden="true"
+        />
       </div>
     </section>
   );
