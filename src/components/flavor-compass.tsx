@@ -23,16 +23,26 @@ export function FlavorCompass() {
       </div>
 
       <div className="flavor-compass__shell">
-        <Image
-          className="flavor-compass__photo-frame"
-          src="/images/%E7%AC%AC%E4%BA%8C%E5%B1%8F/%E7%9B%B8%E6%A1%86.jpg"
-          alt=""
-          width={1487}
-          height={1058}
-          sizes="(max-width: 760px) 92vw, 64vw"
-          unoptimized
-          aria-hidden="true"
-        />
+        <div className="flavor-compass__photo-stage" aria-hidden="true">
+          <div className="flavor-compass__photo-window">
+            <Image
+              className="flavor-compass__photo"
+              src="/images/%E7%AC%AC%E4%BA%8C%E5%B1%8F/01-gin-tonic-photo.png"
+              alt=""
+              fill
+              sizes="(max-width: 760px) 74vw, 52vw"
+              unoptimized
+            />
+          </div>
+          <Image
+            className="flavor-compass__photo-frame"
+            src="/images/%E7%AC%AC%E4%BA%8C%E5%B1%8F/%E7%9B%B8%E6%A1%86.jpg"
+            alt=""
+            fill
+            sizes="(max-width: 760px) 92vw, 64vw"
+            unoptimized
+          />
+        </div>
       </div>
     </section>
   );
