@@ -3,18 +3,26 @@ import Image from "next/image";
 const ingredientCards = [
   {
     key: "gin",
+    label: "GIN",
+    amount: "50 ML",
     src: "/images/%E7%AC%AC%E4%BA%8C%E5%B1%8F/01-ingredient-gin-framed.png",
   },
   {
     key: "tonic",
+    label: "TONIC",
+    amount: "120 ML",
     src: "/images/%E7%AC%AC%E4%BA%8C%E5%B1%8F/01-ingredient-tonic-framed.png",
   },
   {
     key: "lime",
+    label: "LIME",
+    amount: "1 WEDGE",
     src: "/images/%E7%AC%AC%E4%BA%8C%E5%B1%8F/01-ingredient-lime-framed.png",
   },
   {
     key: "ice",
+    label: "ICE",
+    amount: "FULL",
     src: "/images/%E7%AC%AC%E4%BA%8C%E5%B1%8F/01-ingredient-ice-framed.png",
   },
 ];
@@ -56,13 +64,32 @@ export function FlavorCompass() {
           <p>CRISP · COLD · EFFERVESCENT</p>
         </div>
 
-        <div className="flavor-compass__ingredient-stack" aria-hidden="true">
+        <div
+          className="flavor-compass__ingredient-stack"
+          aria-label="Gin and tonic ingredients"
+        >
           {ingredientCards.map((card) => (
             <div
-              className={`flavor-compass__ingredient-card flavor-compass__ingredient-card--${card.key}`}
+              className={`flavor-compass__ingredient-item flavor-compass__ingredient-item--${card.key}`}
               key={card.key}
             >
-              <Image src={card.src} alt="" fill sizes="140px" unoptimized />
+              <div
+                className={`flavor-compass__ingredient-card flavor-compass__ingredient-card--${card.key}`}
+              >
+                <Image
+                  src={card.src}
+                  alt={`${card.label} ingredient`}
+                  fill
+                  sizes="140px"
+                  unoptimized
+                />
+              </div>
+              <p className="flavor-compass__ingredient-note">
+                <span>{card.label}</span>
+                <span aria-hidden="true">—</span>
+                <span>{card.amount}</span>
+              </p>
+              <span className="flavor-compass__ingredient-arrow" aria-hidden="true" />
             </div>
           ))}
         </div>
