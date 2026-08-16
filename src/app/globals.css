@@ -4999,6 +4999,19 @@ body:has(.recipe-detail-page) .site-header-shell {
 /* The second screen is a clean paper field. */
 .flavor-compass--cocktail {
   --home-text: #0b0b09;
+  --home-guide-inset: 91px;
+  --ingredient-card-gap: clamp(16px, min(1.8vw, 2dvh), 24px);
+  --ingredient-card-limit: calc(
+    (
+        58dvh - var(--home-guide-inset) - 16px - var(--ingredient-card-gap) -
+          var(--ingredient-card-gap) - var(--ingredient-card-gap)
+      ) / 4
+  );
+  --ingredient-card-size: clamp(
+    64px,
+    min(6.4vw, 10dvh, var(--ingredient-card-limit)),
+    110px
+  );
   min-height: 100dvh;
   height: 100dvh;
   overflow: visible;
@@ -5085,13 +5098,58 @@ body:has(.recipe-detail-page) .site-header-shell {
   white-space: nowrap;
 }
 
+.flavor-compass__ingredient-stack {
+  position: absolute;
+  z-index: 2;
+  top: 42dvh;
+  left: 0.5%;
+  display: grid;
+  gap: var(--ingredient-card-gap);
+  width: var(--ingredient-card-size);
+}
+
+.flavor-compass__ingredient-card {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  background: transparent;
+  transform: rotate(-4deg);
+  transform-origin: 50% 50%;
+  overflow: visible;
+}
+
+.flavor-compass__ingredient-card--gin {
+  transform: rotate(-4deg);
+}
+
+.flavor-compass__ingredient-card--tonic {
+  transform: translateX(10px) rotate(2.5deg);
+}
+
+.flavor-compass__ingredient-card--lime {
+  transform: translateX(-5px) rotate(-3deg);
+}
+
+.flavor-compass__ingredient-card--ice {
+  transform: translateX(8px) rotate(2deg);
+}
+
+.flavor-compass__ingredient-card img {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  object-position: center;
+}
+
 .flavor-compass__photo-stage {
   position: absolute;
   z-index: 0;
   top: 15%;
-  left: 39%;
+  left: 35.5%;
   display: block;
-  width: min(64vw, 780px);
+  width: min(68vw, 840px);
   aspect-ratio: 1487 / 1058;
   height: auto;
   max-width: none;
@@ -5134,20 +5192,29 @@ body:has(.recipe-detail-page) .site-header-shell {
 }
 
 @media (max-width: 760px) {
+  .flavor-compass--cocktail {
+    --home-guide-inset: 123px;
+    --ingredient-card-gap: 24px;
+    --ingredient-card-size: 74px;
+    min-height: 112dvh;
+    height: 112dvh;
+  }
+
   .flavor-compass--cocktail .flavor-compass__shell {
     width: min(100%, calc(100vw - 36px));
+    height: 112dvh;
     padding-top: 94px;
   }
 
   .flavor-compass__photo-stage {
-    top: 37%;
-    left: 4%;
-    width: 92vw;
+    top: 33%;
+    left: 2%;
+    width: 96vw;
     transform: rotate(0.9deg);
   }
 
   .flavor-compass--cocktail .flavor-compass__copy {
-    top: 13%;
+    top: 12%;
     left: 4%;
     width: 92vw;
   }
@@ -5169,5 +5236,28 @@ body:has(.recipe-detail-page) .site-header-shell {
   .flavor-compass--cocktail .flavor-compass__copy p {
     font-size: 0.62rem;
     letter-spacing: 0.12em;
+  }
+
+  .flavor-compass__ingredient-stack {
+    top: 44%;
+    left: 5%;
+    gap: 24px;
+    width: 74px;
+  }
+
+  .flavor-compass__ingredient-card--gin {
+    transform: rotate(-4deg);
+  }
+
+  .flavor-compass__ingredient-card--tonic {
+    transform: translateX(8px) rotate(2.5deg);
+  }
+
+  .flavor-compass__ingredient-card--lime {
+    transform: translateX(-4px) rotate(-3deg);
+  }
+
+  .flavor-compass__ingredient-card--ice {
+    transform: translateX(6px) rotate(2deg);
   }
 }
