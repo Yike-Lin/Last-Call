@@ -5000,10 +5000,10 @@ body:has(.recipe-detail-page) .site-header-shell {
 .flavor-compass--cocktail {
   --home-text: #0b0b09;
   --home-guide-inset: 91px;
-  --ingredient-card-gap: clamp(16px, min(1.8vw, 2dvh), 24px);
+  --ingredient-card-gap: clamp(12px, min(1.8vw, 1.4dvh), 24px);
   --ingredient-card-limit: calc(
     (
-        58dvh - var(--home-guide-inset) - 16px - var(--ingredient-card-gap) -
+        53.5dvh - var(--home-guide-inset) - 16px - var(--ingredient-card-gap) -
           var(--ingredient-card-gap) - var(--ingredient-card-gap)
       ) / 4
   );
@@ -5101,11 +5101,23 @@ body:has(.recipe-detail-page) .site-header-shell {
 .flavor-compass__ingredient-stack {
   position: absolute;
   z-index: 2;
-  top: 42dvh;
+  top: 46.5dvh;
   left: 0.5%;
   display: grid;
   gap: var(--ingredient-card-gap);
-  width: var(--ingredient-card-size);
+  width: min(45vw, 560px);
+  pointer-events: none;
+}
+
+.flavor-compass__ingredient-item {
+  --ingredient-note-width: clamp(136px, 11vw, 184px);
+  --ingredient-label-gap: clamp(14px, 1.4vw, 24px);
+  --arrow-angle: -4deg;
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--ingredient-card-size) var(--ingredient-note-width) minmax(0, 1fr);
+  align-items: center;
+  min-height: var(--ingredient-card-size);
 }
 
 .flavor-compass__ingredient-card {
@@ -5117,6 +5129,72 @@ body:has(.recipe-detail-page) .site-header-shell {
   transform: rotate(-4deg);
   transform-origin: 50% 50%;
   overflow: visible;
+}
+
+.flavor-compass__ingredient-note {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 0.35em;
+  width: max-content;
+  margin: 0 0 0 var(--ingredient-label-gap);
+  padding-bottom: 5px;
+  color: #17130f;
+  font-family: var(--font-zcool-kuaile), "Segoe Print", cursive;
+  font-size: clamp(0.84rem, 1.05vw, 1.04rem);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  white-space: nowrap;
+  transform: rotate(-3deg);
+  text-shadow: 0 1px rgba(246, 240, 224, 0.72);
+}
+
+.flavor-compass__ingredient-note::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  background: #c94d3d;
+  content: "";
+  transform: rotate(-2deg);
+  transform-origin: left center;
+}
+
+.flavor-compass__ingredient-arrow {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  right: 0;
+  left: calc(var(--ingredient-card-size) + var(--ingredient-note-width) + var(--ingredient-label-gap));
+  height: 1px;
+  background: #c94d3d;
+  opacity: 0.88;
+  transform: translateY(-50%) rotate(var(--arrow-angle));
+  transform-origin: left center;
+}
+
+.flavor-compass__ingredient-arrow::after {
+  position: absolute;
+  top: 50%;
+  right: -1px;
+  width: 8px;
+  height: 8px;
+  border-top: 1.5px solid #c94d3d;
+  border-right: 1.5px solid #c94d3d;
+  content: "";
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.flavor-compass__ingredient-item--tonic,
+.flavor-compass__ingredient-item--lime {
+  --arrow-angle: -5deg;
+}
+
+.flavor-compass__ingredient-item--ice {
+  --arrow-angle: -6deg;
 }
 
 .flavor-compass__ingredient-card--gin {
@@ -5242,7 +5320,21 @@ body:has(.recipe-detail-page) .site-header-shell {
     top: 44%;
     left: 5%;
     gap: 24px;
-    width: 74px;
+    width: 90vw;
+  }
+
+  .flavor-compass__ingredient-item {
+    --ingredient-note-width: 128px;
+    --ingredient-label-gap: 14px;
+  }
+
+  .flavor-compass__ingredient-note {
+    font-size: 0.72rem;
+    letter-spacing: 0.02em;
+  }
+
+  .flavor-compass__ingredient-arrow {
+    right: 16px;
   }
 
   .flavor-compass__ingredient-card--gin {
