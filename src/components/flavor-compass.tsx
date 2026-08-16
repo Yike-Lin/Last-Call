@@ -1,5 +1,24 @@
 import Image from "next/image";
 
+const ingredientCards = [
+  {
+    key: "gin",
+    src: "/images/%E7%AC%AC%E4%BA%8C%E5%B1%8F/01-ingredient-gin-framed.png",
+  },
+  {
+    key: "tonic",
+    src: "/images/%E7%AC%AC%E4%BA%8C%E5%B1%8F/01-ingredient-tonic-framed.png",
+  },
+  {
+    key: "lime",
+    src: "/images/%E7%AC%AC%E4%BA%8C%E5%B1%8F/01-ingredient-lime-framed.png",
+  },
+  {
+    key: "ice",
+    src: "/images/%E7%AC%AC%E4%BA%8C%E5%B1%8F/01-ingredient-ice-framed.png",
+  },
+];
+
 export function FlavorCompass() {
   return (
     <section
@@ -35,6 +54,17 @@ export function FlavorCompass() {
           </div>
           <span className="flavor-compass__rule" aria-hidden="true" />
           <p>CRISP · COLD · EFFERVESCENT</p>
+        </div>
+
+        <div className="flavor-compass__ingredient-stack" aria-hidden="true">
+          {ingredientCards.map((card) => (
+            <div
+              className={`flavor-compass__ingredient-card flavor-compass__ingredient-card--${card.key}`}
+              key={card.key}
+            >
+              <Image src={card.src} alt="" fill sizes="140px" unoptimized />
+            </div>
+          ))}
         </div>
 
         <div className="flavor-compass__photo-stage" aria-hidden="true">
