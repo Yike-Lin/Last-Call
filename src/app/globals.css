@@ -5022,6 +5022,69 @@ body:has(.recipe-detail-page) .site-header-shell {
   padding-top: clamp(112px, 13vh, 156px);
 }
 
+.flavor-compass--cocktail .flavor-compass__copy {
+  position: absolute;
+  z-index: 2;
+  top: 18%;
+  left: 0;
+  width: min(36vw, 500px);
+  color: #0b0b09;
+}
+
+.flavor-compass--cocktail .flavor-compass__title-lockup {
+  position: relative;
+  width: 100%;
+}
+
+.flavor-compass--cocktail .flavor-compass__title-lockup h2 {
+  display: grid;
+  width: max-content;
+  margin: 0;
+  color: #0b0b09;
+  font-family: Baskerville, "Baskerville Old Face", Didot, "Bodoni 72", "Times New Roman", serif;
+  font-size: clamp(4.6rem, 7.6vw, 7.2rem);
+  font-weight: 400;
+  letter-spacing: -0.045em;
+  line-height: 0.78;
+  text-transform: uppercase;
+}
+
+.flavor-compass--cocktail .flavor-compass__title-lockup h2 span {
+  display: block;
+}
+
+.flavor-compass--cocktail .flavor-compass__index {
+  position: absolute;
+  top: 7%;
+  left: 72%;
+  color: #c94d3d;
+  font-family: Baskerville, "Baskerville Old Face", Didot, "Bodoni 72", "Times New Roman", serif;
+  font-size: clamp(7rem, 14vw, 13.5rem);
+  font-weight: 400;
+  letter-spacing: -0.08em;
+  line-height: 0.74;
+  transform: rotate(-1deg);
+}
+
+.flavor-compass--cocktail .flavor-compass__rule {
+  display: block;
+  width: 64px;
+  height: 2px;
+  margin-top: 25px;
+  background: #c94d3d;
+}
+
+.flavor-compass--cocktail .flavor-compass__copy p {
+  margin: 12px 0 0;
+  color: #0b0b09;
+  font-family: "Courier New", Courier, monospace;
+  font-size: clamp(0.64rem, 0.9vw, 0.82rem);
+  font-weight: 700;
+  letter-spacing: 0.19em;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
 .flavor-compass__photo-stage {
   position: absolute;
   z-index: 0;
@@ -5077,9 +5140,34 @@ body:has(.recipe-detail-page) .site-header-shell {
   }
 
   .flavor-compass__photo-stage {
-    top: 18%;
+    top: 37%;
     left: 4%;
     width: 92vw;
     transform: rotate(0.9deg);
+  }
+
+  .flavor-compass--cocktail .flavor-compass__copy {
+    top: 13%;
+    left: 4%;
+    width: 92vw;
+  }
+
+  .flavor-compass--cocktail .flavor-compass__title-lockup h2 {
+    font-size: clamp(3.5rem, 16vw, 5.4rem);
+  }
+
+  .flavor-compass--cocktail .flavor-compass__index {
+    top: 5%;
+    left: 61%;
+    font-size: clamp(6rem, 27vw, 9rem);
+  }
+
+  .flavor-compass--cocktail .flavor-compass__rule {
+    margin-top: 20px;
+  }
+
+  .flavor-compass--cocktail .flavor-compass__copy p {
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
   }
 }
