@@ -23,6 +23,20 @@ export function FlavorCompass() {
       </div>
 
       <div className="flavor-compass__shell">
+        <div className="flavor-compass__copy">
+          <div className="flavor-compass__title-lockup">
+            <h2>
+              <span>GIN &amp;</span>
+              <span>TONIC</span>
+            </h2>
+            <span className="flavor-compass__index" aria-hidden="true">
+              01
+            </span>
+          </div>
+          <span className="flavor-compass__rule" aria-hidden="true" />
+          <p>CRISP · COLD · EFFERVESCENT</p>
+        </div>
+
         <div className="flavor-compass__photo-stage" aria-hidden="true">
           <div className="flavor-compass__photo-window">
             <Image
