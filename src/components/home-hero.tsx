@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { HeroPourScene } from "./hero-pour-scene";
 
 export function HomeHero() {
   return (
@@ -36,7 +37,7 @@ export function HomeHero() {
             <p className="home-poster__prompt">HOLD TO POUR</p>
           </div>
 
-          <div className="home-poster__glass-stage" aria-hidden="true" />
+          <HeroPourScene />
         </div>
       </div>
     </section>
